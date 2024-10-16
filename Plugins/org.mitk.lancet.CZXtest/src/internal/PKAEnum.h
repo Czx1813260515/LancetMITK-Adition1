@@ -6,13 +6,6 @@
 
 namespace lancetAlgorithm
 {
-	enum class CutPlane
-	{
-		DistalCut,
-		PosteriorCut,
-		PosteriorChamferCut,
-		ProximalCut
-	};
 	enum class KneeModel
 	{
 		Femur,        //¹É¹Ç

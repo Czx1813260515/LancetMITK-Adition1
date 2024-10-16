@@ -61,9 +61,6 @@ namespace lancetAlgorithm
 		Point BigHolePoint;
 		std::string CurvePlane;
 		std::vector<double> ContactPoints;
-		std::string DistalCutFilePath;
-		std::string PosteriorCutFilePath;
-		std::string PosteriorChamferCutFilePath;
 		Data(const std::string& stl = "",
 			const Cut& DistalCut = Cut(),
 			const Cut& AnteriorChamferCut = Cut(),
@@ -73,13 +70,10 @@ namespace lancetAlgorithm
 			const Point& ProudPoint = Point(),
 			const Point& SmallHolePoint = Point(),
 			const Point& BigHolePoint = Point(),
-			const std::string& CurvePlane = "", const std::vector<double> ContactPoints = std::vector<double>(),
-			const std::string& DistalCutFilePath = "", const std::string& PosteriorCutFilePath = "",
-			const std::string& PosteriorChamferCutFilePath = "")
+			const std::string& CurvePlane = "", const std::vector<double> ContactPoints = std::vector<double>())
 			: stl(stl), DistalCut(DistalCut), PosteriorChamferCut(AnteriorChamferCut), PosteriorCut(PosteriorChamferCut),
 			OrientationFront(OrientationFront), OrientationBack(OrientationBack), ProudPoint(ProudPoint),
-			SmallHolePoint(SmallHolePoint), BigHolePoint(BigHolePoint), ContactPoints(ContactPoints), DistalCutFilePath(DistalCutFilePath),
-			PosteriorCutFilePath(PosteriorCutFilePath), PosteriorChamferCutFilePath(PosteriorChamferCutFilePath){}
+			SmallHolePoint(SmallHolePoint), BigHolePoint(BigHolePoint), ContactPoints(ContactPoints){}
 	};
 
 	inline void to_json(nlohmann::json& json, const Data& data)
@@ -95,10 +89,7 @@ namespace lancetAlgorithm
 			{"SmallHolePoint", data.SmallHolePoint},
 			{"BigHolePoint", data.BigHolePoint},
 			{"ContactPoints", data.ContactPoints},
-			{"CurvePlane", data.CurvePlane},
-			{"DistalCutFilePath", data.DistalCutFilePath},
-			{"PosteriorCutFilePath", data.PosteriorCutFilePath},
-			{"PosteriorChamferCutFilePath", data.PosteriorChamferCutFilePath}
+			{"CurvePlane", data.CurvePlane}
 		};
 	}
 
@@ -143,13 +134,12 @@ namespace lancetAlgorithm
 		Point OrientationBack;
 		std::string UnderSurface;
 		std::string VerticalSurface;
-		std::string ProximalCutFilePath;
 		TibiaData(const std::string& stl = "",const std::string& thickness ="0", const Cut& ProximalCut = Cut(), const Point& OrientationFront = Point(),
 			const Point& OrientationBack = Point(),
 			const std::string& UnderSurface = "",
-			const std::string& VerticalSurface = "", const std::string& ProximalCutFilePath = "") :stl(stl), thickness(thickness), ProximalCut(ProximalCut),
+			const std::string& VerticalSurface = "") :stl(stl), thickness(thickness),ProximalCut(ProximalCut), 
 			OrientationFront(OrientationFront), OrientationBack(OrientationBack),
-			UnderSurface(UnderSurface), VerticalSurface(VerticalSurface), ProximalCutFilePath(ProximalCutFilePath){}
+			UnderSurface(UnderSurface), VerticalSurface(VerticalSurface) {}
 	};
 
 	inline void to_json(nlohmann::json& json, const TibiaData& tibiaData)
@@ -161,8 +151,7 @@ namespace lancetAlgorithm
 			{"OrientationFront", tibiaData.OrientationFront},
 			{"OrientationBack", tibiaData.OrientationBack},
 			{"UnderSurface", tibiaData.UnderSurface},
-			{"VerticalSurface", tibiaData.VerticalSurface},
-			{"ProximalCutFilePath", tibiaData.ProximalCutFilePath}
+			{"VerticalSurface", tibiaData.VerticalSurface}
 		};
 	}
 

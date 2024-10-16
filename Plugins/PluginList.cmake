@@ -16,7 +16,6 @@ set(MITK_PLUGINS
   org.mitk.lancet.kukarobotcontrol:ON
   org.mitk.lancet.hipplanning:ON
   org.mitk.lancet.cameratest:ON
-  #org.mitk.lancet.cameratest:ON
   org.mitk.lancet.dentalAccuracy:ON
   #org.mitk.lancet.panorama:ON
   org.mitk.lancet.spinedemo:ON

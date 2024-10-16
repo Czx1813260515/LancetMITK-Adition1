@@ -9,8 +9,6 @@
 #include <vtkMatrix4x4.h>
 #include <vtkSTLWriter.h>
 #include <nlohmann/json.hpp>
-#include <mitkSurface.h>
-#include <mitkIOUtil.h>
 
 #include "CalculationHelper.h"
 
@@ -46,7 +44,5 @@
         static void SaveMatrix2File(std::string filePath, vtkMatrix4x4* matrix);
 
         static void WritePolyDataAsSTL(vtkPolyData* polyData, std::string fileName);
-
-        static void SaveDataNodeAsSTL(mitk::DataNode* aDataNode, std::string aFileName);
     };
 

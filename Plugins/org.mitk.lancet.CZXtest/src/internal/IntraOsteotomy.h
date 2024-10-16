@@ -5,16 +5,12 @@
 #include <mitkSurface.h>
 #include <vtkWarpVector.h>
 #include <vtkDataSetAttributes.h>
-#include <vtkCellLocator.h>
 #include "org_mitk_lancet_CZXtest_Export.h"
 #include "CalculationHelper.h"
 #include "PrintDataHelper.h"
 #include "AngleCalculationHelper.h"
 #include "PKAData.h"
 #include "PKADianaAimHardwareDevice.h"
-#include "ChunLiXGImplant.h"
-#include "ChunLITray.h"
-#include "PKAEnum.h"
 
 //meshlib
 #include <MRMesh/MRMesh.h>
@@ -29,8 +25,7 @@ namespace lancetAlgorithm
 	{
 		//Q_OBJECT
 	public:
-		IntraOsteotomy(mitk::DataStorage* dataStorage,  PKADianaAimHardwareDevice* pkaDianaAimHardwareDevice,
-			ChunLiXGImplant* aChunLiXGImplant, ChunLiTray* aChunLITray);
+		IntraOsteotomy(mitk::DataStorage* dataStorage,  PKADianaAimHardwareDevice* pkaDianaAimHardwareDevice /*mitk::Image::Pointer& mitkImage, mitk::Surface::Pointer& surface*/);
 
 		vtkSmartPointer<vtkMatrix4x4>  CalculateTDrillEnd2FemurImage(/*Eigen::Vector3d pointInImage*/);
 		vtkSmartPointer<vtkMatrix4x4> CalculateTDrillEnd2FemurImage2();
@@ -83,12 +78,10 @@ namespace lancetAlgorithm
 
 		void SaveIntialNodePolyDataWithTransform(std::string nodeName, std::string path, vtkTransform* transform = nullptr);
 
-		void Drill(CutPlane aCutPlane);
+		void Drill();
 
 		double GetDrillTip2FemurDrillPlaneDistance(Eigen::Vector3d planePoint, Eigen::Vector3d planeNormal, vtkMatrix4x4* TFemur2Tibia = nullptr);
 		double GetDrillTip2TibiaDrillPlaneDistance(Eigen::Vector3d planePoint, Eigen::Vector3d planeNormal);
-		bool IsDrillInSecurityBoundary(CutPlane aCutPlane);
-		bool IsDrillInSecurityDepth(CutPlane aCutPlane);
 
 	private:
 		template<typename... Args>
@@ -118,9 +111,6 @@ namespace lancetAlgorithm
 		MR::Mesh m_DrillTipMesh;
 		vtkSmartPointer<vtkMatrix4x4> m_LastRoundMatrix;
 		std::string m_DesktopPKAIntraOsteotomyFilePath = std::string(getenv("USERPROFILE")) + "\\Desktop\\PKAModelData\\IntraOsteotomy\\";
-
-		ChunLiTray* m_ChunLiTray;
-		ChunLiXGImplant* m_ChunLiXGImplant;
 	};
 }
 
