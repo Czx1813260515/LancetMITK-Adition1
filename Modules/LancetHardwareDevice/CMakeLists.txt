@@ -65,16 +65,5 @@ mitk_create_module(
   ADDITIONAL_LIBS PUBLIC "${Hans_LIB_RELEASE}"
   #ADDITIONAL_LIBS PUBLIC "${ARIEMEDI_LIB_RELEASE}"
   ADDITIONAL_LIBS PUBLIC "${Jaka_LIB_RELEASE}"
-
-   # Do not automatically create CppMicroServices initialization code.
-  # Because the VTK "auto-init" functionality injects file-local static
-  # initialization code in every cpp file which includes a VTK header,
-  # static initialization order becomes an issue again. For the Mitk
-  # core library, we need to ensure that the VTK static initialization stuff
-  # happens before the CppMicroServices initialization, since the latter
-  # might already use VTK code which needs to access VTK object factories.
-  # Hence, CppMicroServices initialization code is placed manually within
-  # the mitkCoreActivator.cpp file.
-  NO_INIT
 )
 add_subdirectory(cmdapps)
