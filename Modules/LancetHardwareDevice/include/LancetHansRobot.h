@@ -62,13 +62,6 @@ public:
 
 	void WaitMove() override;
 
-
-<<<<<<< HEAD
-	void ReuseRegistration();
-=======
-	//test 
-	std::vector<double> CalculateForward(std::vector<double> aJointAngles);
->>>>>>> Test-of-Thor5
 private:
 	Eigen::Matrix3d GetRotationMatrixByEuler(double rx, double ry, double rz);
 	vtkSmartPointer<vtkMatrix4x4> GetMatrixByRotationAndTranslation(Eigen::Matrix3d aRotation, Eigen::Vector3d aTranslation);
