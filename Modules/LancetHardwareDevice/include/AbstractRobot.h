@@ -26,16 +26,11 @@ found in the LICENSE file.
 class MITKLANCETHARDWAREDEVICE_EXPORT AbstractRobot : public QObject
 {
 public:
-<<<<<<< HEAD
-	//AbstractRobot()// : m_InitialPos(vtkSmartPointer<vtkMatrix4x4>::New())
-	//{
-	//}
-=======
 	AbstractRobot(int N = 6)
 	{
 		m_initJoints.resize(N);
 	}
->>>>>>> Test-of-Thor5
+
 	virtual void Connect() = 0;
 	virtual void Disconnect() = 0;
 	virtual void PowerOn() = 0;
