@@ -39,7 +39,6 @@ public:
 	virtual void Disconnect() = 0;
 	virtual void PowerOn() = 0;
 	virtual void PowerOff() = 0;
-	virtual void PowerOff() = 0;	
 	virtual void Stop() = 0;
 	virtual void Reset() = 0;
 	virtual void SetFreeDrag() = 0;
