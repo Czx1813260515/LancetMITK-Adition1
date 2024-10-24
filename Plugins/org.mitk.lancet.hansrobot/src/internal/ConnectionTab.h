@@ -40,7 +40,7 @@ private:
 private:
 	QWidget* m_TabPage;
 	Ui::HansRobotControls m_ui;
-	LancetDianaRobot* m_Robot;
+	AbstractRobot * m_Robot;
 	mitk::DataStorage* m_dataStorage;
 	AbstractCamera* m_Camera;
 
