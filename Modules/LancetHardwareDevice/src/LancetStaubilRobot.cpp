@@ -3,6 +3,7 @@
 void LancetStaubilRobot::Connect()
 {
 	m_Robot.connectrobot();
+	this->m_initJoints.resize(6);
 }
 
 void LancetStaubilRobot::Disconnect()
@@ -22,22 +23,35 @@ void LancetStaubilRobot::PowerOff()
 
 void LancetStaubilRobot::Translate(double x, double y, double z)
 {
+	vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
+	trans->Identity();
+	trans->Translate(x, y, z);
+
+	this->RobotTransformInTCP(trans->GetMatrix()->GetData());
 }
 
 void LancetStaubilRobot::Translate(double* aDirection, double aLength)
 {
+	this->Translate(aDirection[0] * aLength, aDirection[1] * aLength, aDirection[2] * aLength);
 }
 
 void LancetStaubilRobot::Rotate(double* aDirection, double aAngle)
 {
+	vtkSmartPointer<vtkTransform> trans = vtkSmartPointer<vtkTransform>::New();
+	trans->Identity();
+	trans->RotateWXYZ(aAngle, aDirection);
+
+	this->RobotTransformInTCP(trans->GetMatrix()->GetData());
 }
 
 void LancetStaubilRobot::RecordInitialPos()
 {
+	m_initJoints = GetJointAngles();
 }
 
 void LancetStaubilRobot::GoToInitialPos()
 {
+
 }
 
 void LancetStaubilRobot::SetTCPToFlange()

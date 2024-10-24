@@ -203,6 +203,15 @@ bool LancetDianaRobot::SetCartImpendanceMode()
 	return ret < 0 ? false : true;
 }
 
+void LancetDianaRobot::Sleep(int msec)
+{
+}
+
+inline std::string LancetDianaRobot::to_string(int error_code)
+{
+	return std::string();
+}
+
 std::vector<double> LancetDianaRobot::GetJointAngles()
 {
 	double* jointsAngles = new double[m_JointsNum];
@@ -437,6 +446,16 @@ void LancetDianaRobot::StopFreeDrag()
 	int ret = freeDriving(0, m_IpAddress);
 }
 
+std::vector<double> LancetDianaRobot::CalculateInverse(Eigen::Vector3d aTranslation, Eigen::Vector3d aEulerAngle)
+{
+	return std::vector<double>();
+}
+
+std::vector<double> LancetDianaRobot::CalculateForward(std::vector<double> aJointAngles)
+{
+	return std::vector<double>();
+}
+
 
 bool LancetDianaRobot::SetVelocity(double aVelocity)
 {
@@ -445,6 +464,11 @@ bool LancetDianaRobot::SetVelocity(double aVelocity)
 }
 
 bool LancetDianaRobot::SetAcceleration(double aVelocity)
+{
+	return false;
+}
+
+bool LancetDianaRobot::SetRadius(double aVelocity)
 {
 	return false;
 }

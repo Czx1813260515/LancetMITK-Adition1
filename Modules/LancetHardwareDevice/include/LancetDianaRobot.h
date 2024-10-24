@@ -65,11 +65,15 @@ public:
 
 	void StopFreeDrag() override;
 
+	std::vector<double> CalculateInverse(Eigen::Vector3d aTranslation, Eigen::Vector3d aEulerAngle) override;
 
+	std::vector<double> CalculateForward(std::vector<double> aJointAngles) override;
 
 	bool SetVelocity(double aVelocity) override;
 
 	bool SetAcceleration(double aVelocity) override;
+
+	bool SetRadius(double aVelocity) override;
 
 	void WaitMove() override;
 
@@ -79,6 +83,9 @@ public:
 
 	bool SetCartImpendanceMode();
 
+	void Sleep(int msec) override;
+
+	inline std::string to_string(int error_code) override;
 private:
 
 	int m_JointsNum;

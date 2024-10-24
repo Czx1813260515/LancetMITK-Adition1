@@ -1,0 +1,16 @@
+/**
+  \defgroup org_mitk_lancet_neurosurgery org.mitk.lancet.neurosurgery
+  \ingroup MITKPlugins
+
+  \brief Describe your plugin here.
+
+*/
+
+/**
+  \defgroup org_mitk_lancet_neurosurgery_internal Internal
+  \ingroup org_mitk_lancet_neurosurgery
+
+  \brief This subcategory includes the internal classes of the org.mitk.lancet.neurosurgery plugin. Other
+  plugins must not rely on these classes. They contain implementation details and their interface
+  may change at any time. We mean it.
+*/
