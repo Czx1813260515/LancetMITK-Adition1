@@ -81,7 +81,6 @@ void LancetHansRobot::Translate(double* aDirection, double aLength)
 }
 
 
-
 void LancetHansRobot::Rotate(double* aDirection, double aAngle)
 {
 	vtkSmartPointer<vtkMatrix4x4> matrix = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -115,10 +114,10 @@ void LancetHansRobot::GoToInitialPos()
 	double dUcs_X = 0; double dUcs_Y = 0; double dUcs_Z = 0;
 	double dUcs_Rx = 0; double dUcs_Ry = 0; double dUcs_Rz = 0;
 	// 执行路点运动
-	int nRet = HRIF_WayPointEx(boxID, rbtID, nMoveType, translation[0], translation[1], translation[2], rotation[0], rotation[1], rotation[2],
+	CHECK_ERROR_AND_RETURN(HRIF_WayPointEx(boxID, rbtID, nMoveType, translation[0], translation[1], translation[2], rotation[0], rotation[1], rotation[2],
 		joints[0], joints[1], joints[2], joints[3], joints[4], joints[5], tcpTranslation[0], tcpTranslation[1], tcpTranslation[2], tcpEuler[0], tcpEuler[1], tcpEuler[2],
 		dUcs_X, dUcs_Y, dUcs_Z, dUcs_Rx, dUcs_Ry, dUcs_Rz, dVelocity, dAcc, dRadius, nIsUseJoint, nIsSeek, nIOBit,
-		nIOState, strCmdID);
+		nIOState, strCmdID));
 }
 
 void LancetHansRobot::SetTCPToFlange()
@@ -129,7 +128,7 @@ void LancetHansRobot::SetTCPToFlange()
 	double dTcp_Rx = 0;
 	double dTcp_Ry = 0;
 	double dTcp_Rz = 0;
-	int nRet = HRIF_SetTCP(0, 0, dTcp_X, dTcp_Y, dTcp_Z, dTcp_Rx, dTcp_Ry, dTcp_Rz);
+	CHECK_ERROR_AND_RETURN(HRIF_SetTCP(0, 0, dTcp_X, dTcp_Y, dTcp_Z, dTcp_Rx, dTcp_Ry, dTcp_Rz));
 }
 
 
@@ -288,8 +287,8 @@ bool LancetHansRobot::SetCartStiffParams(std::vector<double> aStiff)
 	if (aStiff.size() != 6)
 		return false;
 	// 设置刚度参数
-	int nRet = HRIF_SetStiffParams(0, 0, aStiff[0], aStiff[1], aStiff[2], aStiff[3], aStiff[4], aStiff[5]);
-	return nRet == 0 ? true : false;
+	CHECK_ERROR_AND_RETURN(HRIF_SetStiffParams(0, 0, aStiff[0], aStiff[1], aStiff[2], aStiff[3], aStiff[4], aStiff[5]));
+	return error_code == 0 ? true : false;
 }
 
 std::vector<double> LancetHansRobot::GetCartDampParams()
@@ -302,8 +301,8 @@ bool LancetHansRobot::SetCartDampParams(std::vector<double> aDamp)
 {
 	if (aDamp.size() != 6)
 		return false;
-	int nRet = HRIF_SetDampParams(0, 0, aDamp[0], aDamp[1], aDamp[2], aDamp[3], aDamp[4], aDamp[5]);
-	return nRet == 0 ? true : false;
+	CHECK_ERROR_AND_RETURN(HRIF_SetDampParams(0, 0, aDamp[0], aDamp[1], aDamp[2], aDamp[3], aDamp[4], aDamp[5]));
+	return error_code == 0 ? true : false;
 }
 
 std::vector<std::vector<double>> LancetHansRobot::GetJointAngleLimits()
