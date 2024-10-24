@@ -20,7 +20,7 @@ namespace DeviceType
 {
 	enum value
 	{
-		NONE = 0x0000,
+		None = 0x0000,
 		SE = 0x0001,
 		LITE = 0x0002,
 		MAX = 0x0003,
@@ -63,6 +63,18 @@ namespace TransmissionStatus
 		AllData = 0x0003,
 		Suspend = 0x0004,
 		ReconstructionReady = 0x0005,
+	};
+}
+
+namespace TransmissionType
+{
+	enum value
+	{
+		None = 0x0000,
+		Passive = 0x0001,
+		Active = 0x0002,
+		Mixed = 0x0003,
+		Alternate = 0x0004,
 	};
 }
 
@@ -157,6 +169,12 @@ public:
 	* @brief: print API and firmware version
 	*/
 	void printAPIandFirmwareVersion();
+
+	/**
+	* @brief: set tracking data transmission type
+	* @param: transmission type: 1-only passive markers(default), 2-only active markers, 3-mixed transamission, 4-alternate transmission
+	*/
+	void setTrackingDataTransmissionType(int type);
 
 	/**
 	* @brief: get device type
@@ -267,6 +285,16 @@ public:
 	void stopTracking();
 
 	/**
+	* @brief: start monitor
+	*/
+	void startVideoMonitor();
+
+	/**
+	* @brief: stop monitor
+	*/
+	void stopVideoMonitor();
+
+	/**
 	* @brief: start imaging
 	*/
 	void startImaging();
@@ -284,6 +312,7 @@ public:
 	* @param4: start position of reconstruction area in the y-direction of the image from left camera
 	* @param5: start position of reconstruction area in the x-direction of the image from right camera  
 	* @param6: start position of reconstruction area in the y-direction of the image from right camera  
+	* @warning: this function only works for the device of RT-PRO
 	*/
 	void reconstructPointCloud(short width, short height, short leftX, short leftY, short rightX, short rightY);
 
@@ -293,15 +322,20 @@ public:
 	void trackingUpdate();
 
 	/**
-	* @brief: get all markers
-	* @return: positions of all markers
+	* @brief: update video monitor data
 	*/
-	std::vector<MarkerPosition> getAllMarkers() { return this->allMarkersTrackingData; };
+	void monitoringUpdate();
+
+	/**
+	* @brief: get all markers with the type
+	* @param: marker type: 0-all(default), 1-passive, 2-active
+	* @return: positions of all markers with the type
+	*/
+	std::vector<MarkerPosition> getAllMarkers(int type = 0);
 
 	/**
 	* @brief: get current tracking data
-	* @param1: all detected markers
-	* @param2: all detected markers' exposure
+	* @param: all detected markers
 	* @return: tracking data of tool
 	*/
 	std::vector<ToolTrackingData> getTrackingData(std::vector<MarkerPosition> cordi);
@@ -325,8 +359,15 @@ public:
 	char* getRightImagingData();
 
 	/**
+	* @brief: get current video data
+	* @return: image from video monitor
+	*/
+	char* getVideoMonitorData();
+
+	/**
 	* @brief: get reconstruction data
 	* @return: reconstruction data
+	* @warning: this function only works for the device of RT-PRO
 	*/
 	std::vector<std::vector<char>> getReconstructionData();
 
@@ -339,6 +380,7 @@ public:
 	/**
 	* @brief: get parameters for reconstruction
 	* @return: parameters
+	* @warning: this function only works for the device of RT-PRO
 	*/
 	std::vector<double> getReconstructParameters() { return this->RCparameters; };
 
@@ -410,8 +452,25 @@ public:
 	*/
 	uint16_t pivotTipCalibration(ToolCalibrationData& tool, std::vector<ToolTrackingData> trackingdataVect, std::vector<float>& tip, std::vector<float>& offset, float& error, bool update = false);
 	
+	/**
+	* @brief: project trakcing data of a tool (source) to an another (target)
+	* @param1: tracking data of the target tool
+	* @param2: tracking data of the source tool
+	* @return: tracking data of the projected source tool
+	* @warning: if target or source tool is missing, the return is equal to the original tracking data of the source tool
+	*/
+	ToolTrackingData trackingDataProjection(ToolTrackingData targetTool, ToolTrackingData sourceTool);
+
+	/**
+	* @brief: open laer
+	* @param: delay time(ms)
+	* @warning: this function only works for the devices of RT-PRO and RT-MAXV
+	*/
+	void laserOn(int delay);
+
 private:
 	Tracking* TK;
+	Tracking* VM;
 	ToolRegi* ToolRegFilter;
 
 	std::vector<int> version;
@@ -429,10 +488,12 @@ private:
 	int imageSize;
 	char* leftimgDataforFrame;
 	char* rightimgDataforFrame;
+	char* videoDataforFrame;
 
 	std::vector<std::vector<char>> reconstructDataVector;
 
 	uint16_t transmissionStatus;
+	uint16_t transmissionType;
 	uint16_t reconstructionStatus;
 	uint16_t connectionStatus;
 	uint16_t systemAlert;

@@ -44,12 +44,14 @@ struct MarkerPosition
 	double P[4];//marker position (x,y,z,1)
 	int leftExposure = 0;//marker exposure
 	int rightExposure = 0;//marker exposure
+	int type = 0;//0(unknown), 1(passive), 2(active)
 };
 
 struct Transformation
 {
 	uint16_t status = TransformationStatus::ToolMissing;//transformation status
 	double matrix[4][4];//transformation matrix [R|t]
+	double invmatrix[4][4];//inverse transformation matrix [R|t]
 	double qw, qx, qy, qz;//transformation quaternion
 	double tx, ty, tz;//tip position
 	double error;//matching error
@@ -80,6 +82,9 @@ public:
 	
 	//get tool tracking data
 	void GetTrackingData(ToolTrackingData& data);
+
+	//inverse tool tracking data
+	static bool InverMatrix(double Matrix[4][4], double invMatrix[4][4]);
 
 protected:
 	int deviceVersion = 0;

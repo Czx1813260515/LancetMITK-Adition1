@@ -26,6 +26,8 @@ private:
 
 protected slots:
 	void UpdateData() override;
+protected:
+	void run() override;
 private:
 	AimHandle m_AimHandle = NULL;
 	E_Interface m_EI;

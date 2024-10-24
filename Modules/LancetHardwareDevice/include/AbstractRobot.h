@@ -39,10 +39,12 @@ public:
 	virtual void Disconnect() = 0;
 	virtual void PowerOn() = 0;
 	virtual void PowerOff() = 0;
+	virtual void PowerOff() = 0;	
 	virtual void Stop() = 0;
 	virtual void Reset() = 0;
 	virtual void SetFreeDrag() = 0;
 	virtual void StopFreeDrag() = 0;
+
 
 	void SetRobotIpAddress(const char* aIP)
 	{
@@ -76,6 +78,7 @@ public:
 
 	virtual bool SetVelocity(double aVelocity) = 0;
 	virtual bool SetAcceleration(double aVelocity) = 0;
+
 	virtual bool SetRadius(double aVelocity) = 0;
 
 	virtual std::vector<std::vector<double>> GetJointAngleLimits() = 0;
@@ -91,6 +94,7 @@ public:
 protected:
 	const char* m_IpAddress;
 	std::vector<double> m_initJoints;
+
 };
 
 #endif

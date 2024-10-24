@@ -1,52 +1,65 @@
 #include "CameraRectLabel.h"
 
-CameraRectLabel::CameraRectLabel(QLabel* aLabel)
+
+CameraRectLabel::CameraRectLabel(QWidget* parent) : QLabel(parent)
 {
-    m_Label = aLabel;
+	setMouseTracking(true);
 }
 
 void CameraRectLabel::StartDraw()
 {
-    m_IsSelecting = true;
+	m_IsSelecting = true;
+	std::cout << "StartDraw m_IsSelecting is true" << std::endl; 
+	update();
+}
+
+void CameraRectLabel::RequestPaint()
+{
+	//if (!m_CurrentRect.isNull()) {
+	//	QPainter painter(this);
+	//	painter.setPen(QPen(Qt::red, 2));  // 使用红色画笔绘制矩形框
+	//	painter.drawRect(m_CurrentRect);     // 绘制矩形框
+	//}
 }
 
 void CameraRectLabel::mousePressEvent(QMouseEvent* event)
 {
-    if (m_IsSelecting == true)
-    {
-        if (event->button() == Qt::LeftButton) {
-
-            m_StartPoint = event->pos();
-            m_EndPoint = m_StartPoint;  // 初始时结束点与起点相同
-            update();  // 更新以触发重绘
-        }
-    }
+	if (m_IsSelecting && event->button() == Qt::LeftButton) {
+		m_SelectionStart = true;     // 标记框选已开始
+		m_StartPoint = event->pos();   // 记录起始点
+		m_CurrentRect = QRect();       // 清空上次的矩形
+		std::cout << "mousePressEvent" << std::endl;
+	}
 }
 
 void CameraRectLabel::mouseMoveEvent(QMouseEvent* event)
 {
-    if (m_IsSelecting) {
-        m_EndPoint = event->pos();  // 更新结束点为当前鼠标位置
-        update();  // 更新以触发重绘
-    }
+	if (m_IsSelecting && m_SelectionStart) {
+		// 更新当前矩形框的大小
+		std::cout << "mouseMoveEvent" << std::endl;
+		m_CurrentRect = QRect(m_StartPoint, event->pos()).normalized();
+		update();  // 刷新界面，触发 paintEvent 重绘
+	}
 }
 
 void CameraRectLabel::mouseReleaseEvent(QMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton) {
-        m_IsSelecting = false;  // 结束选择
-        update();  // 最后一次重绘
-    }
+	if (m_IsSelecting && m_SelectionStart && event->button() == Qt::LeftButton) {
+		m_SelectionStart = false;  // 框选结束
+		m_IsSelecting = false;         // 退出框选模式
+		update();                  // 刷新界面显示最终矩形
+		std::cout << "mouseReleaseEvent" << std::endl;
+	}
 }
 
 void CameraRectLabel::paintEvent(QPaintEvent* event)
 {
-    QLabel::paintEvent(event);
-
-    if (m_IsSelecting) {
-        QPainter painter(this);
-        painter.setPen(QPen(Qt::red, 2, Qt::DashLine));  // 红色虚线框
-        QRect rect = QRect(m_StartPoint, m_EndPoint).normalized();  // 归一化矩形
-        painter.drawRect(rect);  // 绘制矩形
-    }
+	QLabel::paintEvent(event);
+	//std::cout << "paintEvent" << std::endl;
+	if (!m_CurrentRect.isNull()) {
+		QPainter painter(this);
+		painter.setPen(QPen(Qt::red, 2));  // 使用红色画笔绘制矩形框
+		painter.drawRect(m_CurrentRect);     // 绘制矩形框
+	
+	}
 }

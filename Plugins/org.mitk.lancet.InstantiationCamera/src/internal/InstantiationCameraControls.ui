@@ -23,7 +23,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -32,8 +32,8 @@
       <widget class="QWidget" name="verticalLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>60</x>
-         <y>50</y>
+         <x>40</x>
+         <y>10</y>
          <width>160</width>
          <height>112</height>
         </rect>
@@ -72,10 +72,10 @@
       <widget class="QWidget" name="horizontalLayoutWidget_7">
        <property name="geometry">
         <rect>
-         <x>90</x>
-         <y>180</y>
-         <width>571</width>
-         <height>301</height>
+         <x>30</x>
+         <y>130</y>
+         <width>741</width>
+         <height>211</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -200,97 +200,36 @@
       <widget class="QWidget" name="horizontalLayoutWidget">
        <property name="geometry">
         <rect>
-         <x>160</x>
-         <y>540</y>
-         <width>491</width>
-         <height>181</height>
+         <x>120</x>
+         <y>360</y>
+         <width>611</width>
+         <height>391</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_8">
         <item>
-         <spacer name="horizontalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>10</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="LeftImageLabel">
+         <widget class="QWidget" name="RightImageWidget" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>100</width>
-            <height>0</height>
+            <width>576</width>
+            <height>360</height>
            </size>
-          </property>
-          <property name="text">
-           <string/>
           </property>
          </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>10</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item>
-         <widget class="QLabel" name="RightImageLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>100</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>10</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
         </item>
        </layout>
       </widget>
       <widget class="QPushButton" name="DrawRectBtn">
        <property name="geometry">
         <rect>
-         <x>290</x>
-         <y>60</y>
+         <x>320</x>
+         <y>20</y>
          <width>75</width>
          <height>23</height>
         </rect>
@@ -304,7 +243,7 @@
       <attribute name="title">
        <string>Tab 2</string>
       </attribute>
-      <widget class="QPushButton" name="pushButton_5">
+      <widget class="QPushButton" name="ConverRomFileBtn">
        <property name="geometry">
         <rect>
          <x>40</x>
@@ -316,6 +255,79 @@
        <property name="text">
         <string>Rom文件转换</string>
        </property>
+      </widget>
+      <widget class="QWidget" name="horizontalLayoutWidget_2">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>40</y>
+         <width>381</width>
+         <height>80</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLabel" name="label_13">
+          <property name="text">
+           <string>输出路径：</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="SaveARomPathLineEdit"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="SelectARomPathBtn">
+          <property name="text">
+           <string>更改路径</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="horizontalLayoutWidget_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>150</y>
+         <width>781</width>
+         <height>491</height>
+        </rect>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout_10">
+        <item>
+         <widget class="QLabel" name="LeftImageLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="RightImageLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>192</width>
+            <height>120</height>
+           </size>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </widget>
     </widget>

@@ -37,5 +37,13 @@ class LancetStaubilRobot : public AbstractRobot
 	virtual std::vector<std::vector<double>> GetJointAngleLimits() override;
 
 	virtual void WaitMove() override;
+
+private: 
+	Eigen::Vector3d GetXYZEulerByMatrix(vtkMatrix4x4* aMatrix);
+	Eigen::Vector3d GetTranslationByMatrix(vtkMatrix4x4* aMatrix);
+	std::pair<Eigen::Vector3d, Eigen::Vector3d> GetEulerAndTranslationByMatrix(vtkMatrix4x4* aMatrix);
+	vtkSmartPointer<vtkMatrix4x4> GetMatrixByEulerAndTranslation(Eigen::Vector3d euler, Eigen::Vector3d trans);
+private:
+	RobotApi m_Robot;
 };
 

@@ -21,6 +21,7 @@ found in the LICENSE file.
 #include "ui_InstantiationCameraControls.h"
 #include <AriemediCamera.h>
 #include "CameraConnectionTab.h"
+#include "CameraTransTab.h"
 
 /**
   \brief InstantiationCamera
@@ -57,6 +58,7 @@ private:
   Ui::InstantiationCameraControls m_Controls;
   AriemediCamera* m_Camera;
   CameraConnectionTab* m_CameraConnectionTab;
+  CameraTransTab* m_CameraTransTab;
 };
 
 #endif // InstantiationCamera_h

@@ -3,20 +3,14 @@
 
 #include "UdpReader.h"
 #include "ToolRegi.h"
-#include "SystemCRC.h"
+#include "SystemCRCTest.h"
 
-#include <bitset> 
-
-namespace TrackingReplyOption
-{
-	//! The reply options used by BX and TX commands
-	enum value { TransformData = 0x0001, ToolAndMarkerData = 0x0002, SingleStray3D = 0x0004, Tool3Ds = 0x0008, AllTransforms = 0x0800, PassiveStrays = 0x1000 };
-}
+#include <bitset>
 
 class Tracking
 {
 public:
-	Tracking(std::string hostname, bool autoIllum, bool errorPrint);
+	Tracking(std::string hostname, int port, bool autoIllum, bool errorPrint);
 	~Tracking();
 
 	//get connection statues
@@ -42,6 +36,10 @@ public:
 	int startImaging();
 	int endImaging();
 
+	//start and end video monitor
+	int startVideoMonitor();
+	int endVideoMonitor();
+
 	//start and end reconstructing
 	int startRecImaging();
 	int endRecImaging();
@@ -50,9 +48,10 @@ public:
 	int endReconstructing();
 	int reconstructingReady();
 
-	//update tracking information
-	int trackingBX(std::vector<std::string>& warnMessage, std::vector<MarkerPosition>& Cordis, char* leftimg, char* rightimg, int version);
+	//update tracking, reconstruction and monitor information
+	int trackingBX(std::vector<std::string>& warnMessage, std::vector<MarkerPosition>& Cordis, uint16_t transmissionType, char* leftimg, char* rightimg, int version);
 	int receiveReconstructImages(int comm, std::vector<char> &leftimg, std::vector<char> &rightimg);
+	int receiveMonitorImages(char* img);
 
 	//read firmware version
 	std::vector<int> readFirmwareVersion();
@@ -82,7 +81,7 @@ private:
 	int reconstructAreaHeight;
 
 	UdpConnection* connection_;
-	SystemCRC* crcValidator_;
+	SystemCRCTest* crcValidator_;
 	UdpReader reader;
 };
 #endif TRACKING_HPP

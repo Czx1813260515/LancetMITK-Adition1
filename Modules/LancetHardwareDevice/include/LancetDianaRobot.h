@@ -18,8 +18,12 @@ public:
 	void Disconnect() override;
 
 	void PowerOn() override;
-
+	 
 	void PowerOff() override;
+
+	void Stop()override;
+
+	void Reset() override;
 
 	void Translate(double x, double y, double z) override;
 
@@ -45,16 +49,27 @@ public:
 	vtkSmartPointer<vtkMatrix4x4> GetBaseToFlange() override;
 
 	void RobotTransformInBase(double* aMatrix) override;
+
 	void RobotTransformInTCP(double* aMatrix) override;
 
 	std::vector<double> GetCartDampParams() override;
 	bool SetCartDampParams(std::vector<double> aDampParams) override;
+
 	std::vector<double> GetCartStiffParams() override;
 	bool SetCartStiffParams(std::vector<double> aStiffParams) override;
+
 	std::vector<double> GetCartImpeda();
 	bool SetCartImpeda(std::vector<double> aImpeda);
 
+	void SetFreeDrag() override;
+
+	void StopFreeDrag() override;
+
+
+
 	bool SetVelocity(double aVelocity) override;
+
+	bool SetAcceleration(double aVelocity) override;
 
 	void WaitMove() override;
 
@@ -65,6 +80,11 @@ public:
 	bool SetCartImpendanceMode();
 
 private:
-	double m_InitialPos[7] = { 0,0,0,0,0,0,0 };
+
+	int m_JointsNum;
+	// 定义运动速度
+	double dVelocity = 30;
+	// 定义运动加速度
+	double dAcc = 50;
 };
 #endif

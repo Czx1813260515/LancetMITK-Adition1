@@ -6,6 +6,8 @@
 #include <mitkDataStorage.h>
 #include <AriemediCamera.h>
 #include "CameraRectLabel.h"
+#include <PrintDataHelper.h>
+#include "VideoWidget.h"
 
 class CameraConnectionTab : public QWidget
 {
@@ -40,5 +42,6 @@ private:
 	double m_ImageWidth;
 	double m_ImageHeight;
 	CameraRectLabel*  m_CameraRectLabel;
+	VideoWidget* m_RightVideoWidget;
 };
 

@@ -34,9 +34,14 @@ void InstantiationCamera::CreateQtPartControl(QWidget *parent)
 {
   // create GUI widgets from the Qt Designer's .ui file
   m_Controls.setupUi(parent);
-
+  //parent->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+  //m_Controls.tabWidget->setAttribute(Qt::WA_TransparentForMouseEvents, false);
+  //m_Controls.tab->setAttribute(Qt::WA_TransparentForMouseEvents, false);
   m_Camera = new AriemediCamera();
   m_CameraConnectionTab = new CameraConnectionTab(m_Controls, GetDataStorage(), m_Camera, parent);
+
+  m_CameraTransTab = new CameraTransTab(m_Controls, m_Camera, parent);
+
 }
 
 void InstantiationCamera::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,

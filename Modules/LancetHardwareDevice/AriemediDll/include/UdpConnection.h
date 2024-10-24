@@ -18,11 +18,11 @@ typedef uint8_t byte_t;
 class UdpConnection
 {
 public:
-	UdpConnection(std::string hostname, bool errorPrint);
+	UdpConnection(std::string hostname, int port, bool errorPrint);
 	~UdpConnection();
 
 	//read and write information from device
-	int read(byte_t* buffer, int length) const;
+	int read(byte_t* buffer, byte_t* buffer2, int length, int& port) const;
 	int write(byte_t* buffer, int length) const;
 
 	//clean buffer
@@ -56,6 +56,7 @@ private:
 	
 	std::string deviceIP;
 	std::string localIP;
+	int portNumber;
 
 	bool errorShow;
 

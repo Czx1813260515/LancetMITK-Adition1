@@ -13,7 +13,8 @@
 #include <eigen3/Eigen/Dense>
 #include <QObject>
 #include "MitkLancetHardwareDeviceExports.h"
-class MITKLANCETHARDWAREDEVICE_EXPORT AbstractCamera : public QObject
+#include <qthread.h>
+class MITKLANCETHARDWAREDEVICE_EXPORT AbstractCamera : public QThread
 {
 	Q_OBJECT
 public:
@@ -60,6 +61,7 @@ protected:
 		return matrix;
 	}
 
+	virtual void run() = 0;
 
 protected:
 	QTimer* m_CameraUpdateTimer;

@@ -3,6 +3,7 @@
 LancetDianaRobot::LancetDianaRobot()
 {
 	this->SetRobotIpAddress("192.168.10.75");
+	m_JointsNum = 0;
 }
 
 void LancetDianaRobot::Connect()
@@ -24,8 +25,9 @@ void LancetDianaRobot::Connect()
 		delete pinfo;
 		pinfo = nullptr;
 	}
-	int jointCount = getJointCount();
-	m_initJoints.resize(jointCount);
+	m_JointsNum = getJointCount();
+	std::cout << "Get m_JointsNum from Robot:" << m_JointsNum << std::endl;
+	m_initJoints.resize(m_JointsNum);
 }
 
 void LancetDianaRobot::Disconnect()
@@ -45,6 +47,16 @@ void LancetDianaRobot::PowerOn()
 void LancetDianaRobot::PowerOff()
 {
 	holdBrake();
+}
+
+void LancetDianaRobot::Stop()
+{
+	int ret = stop(m_IpAddress);
+}
+
+void LancetDianaRobot::Reset()
+{
+	int ret = cleanErrorInfo();
 }
 
 void LancetDianaRobot::Translate(double x, double y, double z)
@@ -95,15 +107,15 @@ void LancetDianaRobot::RecordInitialPos()
 
 void LancetDianaRobot::GoToInitialPos()
 {
-	int count = getJointCount();
-	double* joints_final = new double[count];
-	for (int i = 0; i < count; ++i)
+	double* joints_final = new double[m_JointsNum];
+	for (int i = 0; i < m_JointsNum; ++i)
 	{
 		joints_final[i] = m_initJoints[i];
 	}
 	moveJToTarget(joints_final, 0.2, 0.4);
 	WaitMove();
 	delete[] joints_final;
+	joints_final = nullptr;
 }
 
 void LancetDianaRobot::SetTCPToFlange()
@@ -193,15 +205,16 @@ bool LancetDianaRobot::SetCartImpendanceMode()
 
 std::vector<double> LancetDianaRobot::GetJointAngles()
 {
-	double* angles = new double[m_initJoints.size()];
+	double* jointsAngles = new double[m_JointsNum];
 	std::vector<double> angleVec;
-	getJointPos(angles);
+	getJointPos(jointsAngles);
 	for (int i = 0; i < 7; ++i)
 	{
-		angleVec.push_back(angles[i]);
+		angleVec.push_back(jointsAngles[i]);
 	}
 
-	delete[] angles;
+	delete[] jointsAngles;
+	jointsAngles = nullptr;
 	return angleVec;
 }
 
@@ -264,10 +277,10 @@ vtkSmartPointer<vtkMatrix4x4> LancetDianaRobot::GetFlangeToTCP()
 
 vtkSmartPointer<vtkMatrix4x4> LancetDianaRobot::GetBaseToFlange()
 {
-	double joints[7] = { 0.0 };
-	int ret = getJointPos(joints, m_IpAddress);
+	double* jointsAngles= new double[m_JointsNum];
+	int ret = getJointPos(jointsAngles, m_IpAddress);
 	double pose[6] = {};
-	forward(joints, pose);
+	forward(jointsAngles, pose);
 	double matrix[16] = {};
 	pose2Homogeneous(pose, matrix);
 	vtkSmartPointer<vtkMatrix4x4> base2End = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -276,6 +289,8 @@ vtkSmartPointer<vtkMatrix4x4> LancetDianaRobot::GetBaseToFlange()
 	base2End->SetElement(0, 3, base2End->GetElement(0, 3) * 1000);
 	base2End->SetElement(1, 3, base2End->GetElement(1, 3) * 1000);
 	base2End->SetElement(2, 3, base2End->GetElement(2, 3) * 1000);
+	delete[]jointsAngles;
+	jointsAngles = nullptr;
 	return base2End;
 }
 
@@ -289,10 +304,12 @@ void LancetDianaRobot::RobotTransformInBase(double* aMatrix)
 	vtkMatrix->SetElement(2, 3, vtkMatrix->GetElement(2, 3) / 1000);
 	vtkMatrix->Transpose();
 	homogeneous2Pose(vtkMatrix->GetData(), pose);
-	double joints_final[7]{};
+	double* joints_final= new double [m_JointsNum];
 	inverse(pose, joints_final, nullptr);
 	moveJToTarget(joints_final, 0.2, 0.4);
 	WaitMove();
+	delete joints_final;
+	joints_final = nullptr;
 }
 
 void LancetDianaRobot::RobotTransformInTCP(double* aMatrix)
@@ -410,7 +427,24 @@ bool LancetDianaRobot::SetCartImpeda(std::vector<double> aImpeda)
 	return ret < 0 ? false : true;
 }
 
+void LancetDianaRobot::SetFreeDrag()
+{
+	int ret = freeDriving(1, m_IpAddress);
+}
+
+void LancetDianaRobot::StopFreeDrag()
+{
+	int ret = freeDriving(0, m_IpAddress);
+}
+
+
 bool LancetDianaRobot::SetVelocity(double aVelocity)
+{
+	dVelocity = aVelocity;
+	return false;
+}
+
+bool LancetDianaRobot::SetAcceleration(double aVelocity)
 {
 	return false;
 }

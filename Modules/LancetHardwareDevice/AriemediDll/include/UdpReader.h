@@ -2,7 +2,6 @@
 #define _UDP_READER_HPP_
 
 #include "UdpConnection.h"
-#include <cstddef>
 
 class UdpReader
 {
@@ -28,6 +27,8 @@ public:
 
 	//device's reply
 	std::byte buffer[1500];
+	std::byte buffer2[1500];
+	int port;
 
 private:
 	UdpConnection* UdpCon_;

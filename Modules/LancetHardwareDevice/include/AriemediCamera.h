@@ -5,6 +5,12 @@
 #include <DeviceScan.h>
 #include <vtkPolyData.h>
 #include <vtkPoints.h>
+#include <qthread.h>
+#include <mitkDataNode.h>
+#include <qfuture.h>
+#include <QtConcurrent/qtconcurrentrun.h>
+#include <ReconstructPointCloud.h>
+#include <mitkPointSet.h>
 class MITKLANCETHARDWAREDEVICE_EXPORT AriemediCamera : public AbstractCamera
 {
 	Q_OBJECT
@@ -27,22 +33,36 @@ public:
 	void DisplayArea(short width, short height, short leftX, short leftY, short rightX, short
 		rightY);
 	
-	std::pair<const char*, const char*> GetImageData();
+	std::pair<char*, char*> GetImageData();
 	void HideArea();
 	std::pair<double, double> GetImageSize();
 
 	void ConvertRomToARom(std::string out, std::string in);
-	//vtkSmartPointer<vtkPolyData> Get
+
+	void SetAreaDisplay(short leftX, short leftY, short rightX, short rightY, short width = 50, short height = 40);
+
+	char* GetRightImage();
+
+	mitk::DataNode::Pointer GetPointCloud();
+
 public slots:
 	void UpdateData() override;
+
+signals:
+	void ImageUpdateClock();
 
 private:
 	void UpdateImageData(/*std::unique_ptr<char[]>& aLeftImage, std::unique_ptr<char[]>& aRightImage*/);
 
 	bool UpdateCameraToToolMatrix(ToolTrackingData aToolTrackingData);
+
+	mitk::DataNode::Pointer GetCameraPointCloudDataNode(std::vector<std::vector<float>> aPointCloud);
+
+	void RequestUpdateImage();
 private:
-	ARMDCombinedAPI m_Tracker;
 	std::shared_ptr<char[]> m_LeftImage;
 	std::shared_ptr<char[]> m_RightImage;
+	size_t m_PreviousImageSize = 0;
+	QTimer* m_ImageUpdateTimer;
 };
 
