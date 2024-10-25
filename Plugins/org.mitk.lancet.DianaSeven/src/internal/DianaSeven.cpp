@@ -40,15 +40,12 @@ void DianaSeven::CreateQtPartControl(QWidget* parent)
 	m_Controls.setupUi(parent);
 	
 	InitGlobalVariable();
-	m_DianaAimHardwareService = new lancetAlgorithm::DianaAimHardwareService();
-	m_PrecisionTab = new PrecisionTab(m_Controls, this->GetDataStorage(), m_DianaAimHardwareService, parent);
+	m_AimCamera = new AimCamera();
+	m_DianaSevenRobot = new DianaRobot();
+	m_LancetRobotRegistration = new LancetRobotRegistration(m_DianaSevenRobot, m_AimCamera);
+	m_PrecisionTab = new PrecisionTab(m_Controls, this->GetDataStorage(), m_DianaSevenRobot,m_AimCamera,m_LancetRobotRegistration, parent);
 
-	connect(m_Controls.pushButton_initDiana_2, &QPushButton::clicked, this, &DianaSeven::initDianaNet);
 	connect(m_Controls.pushButton_MoveZZJ, &QPushButton::clicked, this, &DianaSeven::move_zzj);
- 
-	connect(m_Controls.pushButton_1, &QPushButton::clicked, this, &DianaSeven::Position1);
-	connect(m_Controls.pushButton_2, &QPushButton::clicked, this, &DianaSeven::Position2);
-	connect(m_Controls.pushButton_4, &QPushButton::clicked, this, &DianaSeven::Position3);
 
 	connect(m_Controls.pushButton_AccuracyPosition, &QPushButton::clicked, this, &DianaSeven::PositionAccuracy);
 	connect(m_Controls.pushButton_Repeatability, &QPushButton::clicked, this, &DianaSeven::PositionRepeatability);
@@ -75,88 +72,14 @@ void DianaSeven::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWind
 
 }
 
-void DianaSeven::initDianaNet()
-{
-	m_Controls.textBrowser->append("hello world\n");
-
-	srv_net_st* pinfo = new srv_net_st();
-	memset(pinfo->SrvIp, 0x00, sizeof(pinfo->SrvIp));
-	memcpy(pinfo->SrvIp, "192.168.10.75", strlen("192.168.10.75"));
-	pinfo->LocHeartbeatPort = 0;
-	pinfo->LocRobotStatePort = 0;
-	pinfo->LocSrvPort = 0;
-	int ret = initSrv(nullptr, nullptr, pinfo);
-	if (ret < 0)
-	{
-		m_Controls.textBrowser->append("192.168.10.75 initSrv failed! Return value =-1");
-	}
-	if (pinfo)
-	{
-		delete pinfo;
-		pinfo = nullptr;
-	}
-	releaseBrake();
-}
-
-
 
 void DianaSeven::move_zzj()
 {
-	/*整体思路：读取机械臂当前关节位置DJ1-7；->转化为轴角->轴角转齐次变换矩阵A（当前位姿下）
-	->右乘一个移动矩阵B（平移）-》得到控制机械臂运动的矩阵（目标位姿）T-》
-		齐次变换矩阵T转目标轴角-》读取目标轴角并运动到该轴角*/
-
-	//getJointPos(joints, strIpAddress);//读取DJ1-7
-	//printf("getJointPos: %f ,%f, %f, %f, %f, %f, %f\n", joints[0], joints[1], joints[2], joints[3], joints[4], joints[5], joints[6]);
-	//
-	//forward(joints, pose, nullptr, strIpAddress);//Dj11-7转x y z Rx Ry Rz轴角
-	//printf(" forward succeed! Pose: %f, %f, %f, %f, %f, %f\n ", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
-
-	getTcpPos(pose, m_RobotIpAddress);
-	printf(" forward succeed! Pose: %f, %f, %f, %f, %f, %f\n ", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
-
-	pose2Homogeneous(pose, forward_Matrix);//轴角转齐次变换矩阵
-	//PrintDataHelper::CoutMatrix("forward_Matrix", forward_Matrix);
-	//PrintDataHelper::PrintMatrix("forward_Matrix", forward_Matrix);
-
-	//forward_Matrix->右乘一个移动矩阵->得到一个T_newtargetMatrix
-	double x = m_Controls.lineEdit_X->text().toDouble() / 1000;
-	double y = m_Controls.lineEdit_Y->text().toDouble() / 1000;
-	double z = m_Controls.lineEdit_Z->text().toDouble() / 1000;
-
-	vtkNew<vtkTransform> tmpTrans;
-	tmpTrans->PostMultiply();
-	tmpTrans->SetMatrix(forward_Matrix);
-	vtkNew<vtkMatrix4x4> transposedMatrix1;
-	transposedMatrix1->DeepCopy(tmpTrans->GetMatrix());
-	transposedMatrix1->Transpose();
-	tmpTrans->SetMatrix(transposedMatrix1);
-	tmpTrans->Translate(x, y, z);
-	vtkNew<vtkMatrix4x4> transposedMatrix2;
-	transposedMatrix2->DeepCopy(tmpTrans->GetMatrix());
-	transposedMatrix2->Transpose();
-	tmpTrans->SetMatrix(transposedMatrix2);
-
-	tmpTrans->Update();
-	std::cout << std::fixed << std::setprecision(5);
-	tmpTrans->Print(std::cout);
-
-	vtkMatrix4x4* matrix = tmpTrans->GetMatrix();
-	auto T_newtargetMatrix = matrix->GetData();
-	//PrintDataHelper::CoutMatrix("T_newtargetMatrix", T_newtargetMatrix);
-	//PrintDataHelper::PrintMatrix("T_newtargetMatrix", T_newtargetMatrix);
-
-	homogeneous2Pose(T_newtargetMatrix, pose);
-	printf("Diana API homogeneous2Pose got: %f, %f, %f, %f, %f, %f\n", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
-
-	inverse(pose, joints_final, nullptr, m_RobotIpAddress);
-	//moveJToPose(pose, vel, acc, nullptr, zv_shaper_order, zv_shaper_frequency, zv_shaper_damping_ratio, strIpAddress);
-	//printf(" moveJToPose Pose: %f, %f, %f, %f, %f, %f\n ", pose[0], pose[1], pose[2], pose[3], pose[4], pose[5]);
-	moveJToTarget(joints_final, 0.2, 0.4);
-
-	wait_move(m_RobotIpAddress);
+	double x = m_Controls.lineEdit_X->text().toDouble();
+	double y = m_Controls.lineEdit_Y->text().toDouble();
+	double z = m_Controls.lineEdit_Z->text().toDouble();
+	m_DianaSevenRobot->Translate(x, y, z);
 }
-
 
 void DianaSeven::wait_move(const char* m_RobotIpAddress)
 {
@@ -178,40 +101,6 @@ void DianaSeven::wait_move(const char* m_RobotIpAddress)
 	}
 	stop();
 }
-
-void DianaSeven::GoInitial()
-{
-	//double pose2[6] = { 0.5069,0.1828,0.5044,-0.002217,-0.00238,0.003824 };
-	double pose2[6] = { 0.272069,0.355601,0.347205,0.01958,-0.088089,0.01899 };
-	moveJToPose(pose2, vel, acc, nullptr, zv_shaper_order, zv_shaper_frequency, zv_shaper_damping_ratio);
-	wait_move(m_RobotIpAddress);
-}
-
-void DianaSeven::Position1()
-{
-	//double aaa[7] = { -1.87254e-07,0.349064,-1.21715e-05,1.83259,-1.87254e-07,1.30899,-1.87254e-07 };
-	double aaa[7] = { -0.51068333913,-0.44664720888,0.073478361509,2.499259129,0.03511602455,-1.0516132342,-0.51033427328 };
-	moveJToTarget(aaa, 0.2, 0.4);
-	//double Position[6] = { 0.309263,0.133743,0.275510,-0.00791,-0.00177,0.029970 };
-	//moveJToPose(Position, vel, acc, nullptr, zv_shaper_order, zv_shaper_frequency, zv_shaper_damping_ratio);
-	wait_move(m_RobotIpAddress);
-}
-
-void DianaSeven::Position2()
-{
-	double Position2[6] = { 0.521397,0.393198,0.616475,0.000298,-0.060823,0.036656 };
-	moveJToPose(Position2, vel, acc, nullptr, zv_shaper_order, zv_shaper_frequency, zv_shaper_damping_ratio);
-	wait_move(m_RobotIpAddress);
-}
-
-void DianaSeven::Position3()
-{
-	double Position[6] = { 0.309263,0.133743,0.275510,-0.00791,-0.00177,0.029970 };
-	moveJToPose(Position, vel, acc, nullptr, zv_shaper_order, zv_shaper_frequency, zv_shaper_damping_ratio);
-	wait_move(m_RobotIpAddress);
-}
-
-
 
 void DianaSeven::OpenHandGuiding()
 {
@@ -241,6 +130,11 @@ void DianaSeven::PositionAccuracy()
 
 void DianaSeven::PositionRepeatability()
 {
+	double PosRepeatInitial[6] = { 0.272069,0.355601,0.347205,0.01958,-0.088089,0.01899 };
+	moveJToPose(PosRepeatInitial, vel, acc, nullptr, zv_shaper_order, zv_shaper_frequency, zv_shaper_damping_ratio);
+	wait_move(m_RobotIpAddress);
+
+	QThread::msleep(3000);
 }
 
 
@@ -277,7 +171,8 @@ void DianaSeven::InitHardwareDeviceTabConnection()
 	connect(m_Controls.PowerOffBtn, &QPushButton::clicked, this, &DianaSeven::PowerOffBtnClicked);
 	connect(m_Controls.ConnectNDIBtn, &QPushButton::clicked, this, &DianaSeven::ConnectCameraClicked);
 	connect(m_Controls.UpdateCameraBtn, &QPushButton::clicked, this, &DianaSeven::UpdateCameraBtnClicked);
-	connect(m_DianaAimHardwareService, &lancetAlgorithm::DianaAimHardwareService::CameraUpdateClock, this, &DianaSeven::HandleUpdateRenderRequest);
+	connect(m_AimCamera, &AimCamera::CameraUpdateClock, this, &DianaSeven::HandleUpdateRenderRequest);
+	
 }
 
 void DianaSeven::InitRobotRegistrationTabConnection()
@@ -334,14 +229,19 @@ void DianaSeven::InitRobotRegistrationTabConnection()
 		Rotate(rotationDirection);
 		});
 
-	connect(m_Controls.SetTcpToFlangeBtn, &QPushButton::clicked, this, [this]() {m_DianaAimHardwareService->SetTCP2Flange(); } );
-	connect(m_Controls.RecordInitPosBtn, &QPushButton::clicked, this, [this]() {m_DianaAimHardwareService->RecordIntialPos(); } );
-	connect(m_Controls.GoToInitPosBtn, &QPushButton::clicked, this, [this]() {m_DianaAimHardwareService->GoToInitPos(); });
+	connect(m_Controls.SetTcpToFlangeBtn, &QPushButton::clicked, this, [this]() {m_DianaSevenRobot->SetTCPToFlange(); } );
+	connect(m_Controls.RecordInitPosBtn, &QPushButton::clicked, this, [this]() {m_DianaSevenRobot->RecordInitialPos(); } );
+	connect(m_Controls.GoToInitPosBtn, &QPushButton::clicked, this, [this]() {m_DianaSevenRobot->GoToInitialPos(); });
 	connect(m_Controls.CaptureRobotBtn, &QPushButton::clicked, this, [this]() 
-		{m_Controls.CaptureCountLineEdit->setText(QString::number(m_DianaAimHardwareService->CaptureRobot())); });
-	connect(m_Controls.RobotAutoRegistationBtn, &QPushButton::clicked, this, [this]() {m_DianaAimHardwareService->RobotAutoRegistration(); } );
+		{m_Controls.CaptureCountLineEdit->setText(QString::number(m_LancetRobotRegistration->captureRobot())); });
+	connect(m_Controls.RobotAutoRegistationBtn, &QPushButton::clicked, this, [this]() {m_LancetRobotRegistration->autoCollection(); } );
+	//connect(m_Controls.ResetRobotRegistrationBtn, &QPushButton::clicked, this, [this]()
+	//	{m_Controls.CaptureCountLineEdit->setText(QString::number(m_LancetRobotRegistration->replaceRegistration())); });
 	connect(m_Controls.ResetRobotRegistrationBtn, &QPushButton::clicked, this, [this]()
-		{m_Controls.CaptureCountLineEdit->setText(QString::number(m_DianaAimHardwareService->ResetRobotRegistration())); });
+		{
+			int newCount = m_LancetRobotRegistration->replaceRegistration(); // 获取返回值
+			m_Controls.CaptureCountLineEdit->setText(QString::number(newCount)); // 设置文本
+		});
 
 	connect(m_Controls.SaveRobotRegistrationBtn, &QPushButton::clicked, this, [this]() 
 		{
@@ -351,8 +251,8 @@ void DianaSeven::InitRobotRegistrationTabConnection()
 			std::string baseRF2ToBaseFileName = "T_BaseRFToBase.txt";
 			std::string flangeToEndRFFileName = "T_FlangeToEndRF.txt";
 
-			FileIO::SaveMatrix2File(FileIO::CombinePath(filename.toStdString(), baseRF2ToBaseFileName).string(), m_DianaAimHardwareService->GetBaseRF2BaseMatrix());
-			FileIO::SaveMatrix2File(FileIO::CombinePath(filename.toStdString(), flangeToEndRFFileName).string(), m_DianaAimHardwareService->GetEnd2EndRFMatrix());
+			FileIO::SaveMatrix2File(FileIO::CombinePath(filename.toStdString(), baseRF2ToBaseFileName).string(), m_LancetRobotRegistration->getBaseRFToBase());//BaseRFToBase??   Perhaps we need to reverse it
+			FileIO::SaveMatrix2File(FileIO::CombinePath(filename.toStdString(), flangeToEndRFFileName).string(), m_LancetRobotRegistration->getFlangeToEndRF());
 		});
 	connect(m_Controls.ReuseRobotRegistationBtn, &QPushButton::clicked, this, [this]() 
 		{
@@ -365,60 +265,73 @@ void DianaSeven::InitRobotRegistrationTabConnection()
 			vtkSmartPointer<vtkMatrix4x4> flangeToEndRF = vtkSmartPointer<vtkMatrix4x4>::New();
 			FileIO::ReadTextFileAsvtkMatrix(FileIO::CombinePath(filename.toStdString(), baseToBaseRFFileName).string(), baseRFToBase);
 			FileIO::ReadTextFileAsvtkMatrix(FileIO::CombinePath(filename.toStdString(), flangeToEndRFFileName).string(), flangeToEndRF);
-			m_DianaAimHardwareService->SetBaseRF2BaseMatrix(baseRFToBase);
-			m_DianaAimHardwareService->SetEnd2EndRFMatrix(flangeToEndRF);
+			m_LancetRobotRegistration->getBaseRFToBase();
+			m_LancetRobotRegistration->getFlangeToEndRF();
 			PrintDataHelper::CoutMatrix("TBaseRF2Base", baseRFToBase);
 			PrintDataHelper::CoutMatrix("TFlange2EndRF", flangeToEndRF);
 		});
 
-	connect(m_Controls.StopRobotMoveBtn, &QPushButton::clicked, this, [this]() {m_DianaAimHardwareService->StopMove(); });
-	connect(m_Controls.ClearRobotErrorInfoBtn, &QPushButton::clicked, this, [this]() {m_DianaAimHardwareService->CleanRobotErrorInfo(); });
+	connect(m_Controls.StopRobotMoveBtn, &QPushButton::clicked, this, [this]() {m_DianaSevenRobot->stopRobot(); });
+	connect(m_Controls.ClearRobotErrorInfoBtn, &QPushButton::clicked, this, [this]() {m_DianaSevenRobot->CleanRobotErrorInfo(); });
 
 	connect(m_Controls.ReadRobotJointAnglesBtn, &QPushButton::clicked, this, &DianaSeven::ReadRobotJointAnglesBtnClicked);
 	connect(m_Controls.SetRobotJointAnglesBtn, &QPushButton::clicked, this, &DianaSeven::SetRobotJointAnglesBtnClicked);
 	connect(m_Controls.GetRobotJointsLimitBtn, &QPushButton::clicked, this, &DianaSeven::GetRobotJointsLimitBtnClicked);
 
-	connect(m_Controls.SetRobotPositionModeBtn, &QPushButton::clicked, this, [this]() {m_DianaAimHardwareService->SetPositionMode(); });
-	connect(m_Controls.SetRobotJointsImpedanceModelBtn, &QPushButton::clicked, this, [this]() {m_DianaAimHardwareService->SetJointImpendanceMode(); });
-	connect(m_Controls.SetRobotCartImpedanceModeBtn, &QPushButton::clicked, this, [this]() {m_DianaAimHardwareService->SetCartImpendanceMode(); });
+	connect(m_Controls.SetRobotPositionModeBtn, &QPushButton::clicked, this, [this]() {m_DianaSevenRobot->SetPositionMode(); });
+	connect(m_Controls.SetRobotJointsImpedanceModelBtn, &QPushButton::clicked, this, [this]() {m_DianaSevenRobot->SetJointImpendanceMode(); });
+	connect(m_Controls.SetRobotCartImpedanceModeBtn, &QPushButton::clicked, this, [this]() {m_DianaSevenRobot->SetCartImpendanceMode(); });
 	
 	connect(m_Controls.ReadRobotImpedaBtn, &QPushButton::clicked, this, &DianaSeven::ReadRobotImpedaBtnClicked);
 	connect(m_Controls.SetRobotImpedaBtn, &QPushButton::clicked, this, &DianaSeven::SetRobotImpedaBtnClicked);
 	
 	connect(m_Controls.AppendToolTipBtn, &QPushButton::clicked, this, &DianaSeven::AppendToolTipBtnClicked);
 	connect(m_Controls.AppendToolMatrixBtn, &QPushButton::clicked, this, &DianaSeven::AppendToolMatrixBtnClicked);
+	connect(m_LancetRobotRegistration, &LancetRobotRegistration::countPose, this, &DianaSeven::upDateRegistionLineEdit);
 }
 
 bool DianaSeven::Translate(const double axis[3])
 {
-	m_DianaAimHardwareService->Translate(axis, m_Controls.TranslateDistanceLineEdit->text().toDouble());
+	double direction[3] = { axis[0], axis[1], axis[2] }; // 方向向量
+	double length = m_Controls.TranslateDistanceLineEdit->text().toDouble(); // 移动长度
+	m_DianaSevenRobot->Translate(direction, length); // 调用DianaRobot的Translate函数
 	return true;
 }
 
 bool DianaSeven::Rotate(const double axis[3])
 {
-	m_DianaAimHardwareService->Rotate(axis, m_Controls.RotateAngleLineEdit->text().toDouble());
+	double localAxis[3];
+	for (int i = 0; i < 3; ++i) {
+		localAxis[i] = axis[i];
+	}
+
+	m_DianaSevenRobot->Rotate(localAxis, m_Controls.RotateAngleLineEdit->text().toDouble());
 	return true;
+}
+
+void DianaSeven::upDateRegistionLineEdit(int aCount)
+{
+	m_Controls.CaptureCountLineEdit->setText(QString::number(aCount));
 }
 
 void DianaSeven::ConnectRobotBtnClicked()
 {
-	m_DianaAimHardwareService->ConnectRobot();
+	m_DianaSevenRobot->Connect();
 }
 
 void DianaSeven::PowerOnBtnClicked()
 {
-	m_DianaAimHardwareService->RobotPowerOn();
+	m_DianaSevenRobot->PowerOn();
 }
 
 void DianaSeven::PowerOffBtnClicked()
 {
-	m_DianaAimHardwareService->RobotPowerOff();
+	m_DianaSevenRobot->PowerOff();
 }
 
 void DianaSeven::ConnectCameraClicked()
 {
-	m_DianaAimHardwareService->ConnectCamera();
+	m_AimCamera->Connect();
 }
 
 void DianaSeven::UpdateCameraBtnClicked()
@@ -435,8 +348,8 @@ void DianaSeven::UpdateCameraBtnClicked()
 
 	/*std::vector<std::string> toolsName = {"RobotBaseRF", "PKAFemurRF", "PKATibiaRF", "BluntProbe", "RobotEndRF", "PKAProbe", "PKADrill"};*/
 	std::vector<std::string> toolsName = { "RobotBaseRF",  "VerificationBlock", "RobotEndRF", "Probe"};
-	m_DianaAimHardwareService->InitToolsName(toolsName, std::move(lables));
-	m_DianaAimHardwareService->StartCamera();
+	m_AimCamera->InitToolsName(toolsName);
+	m_AimCamera->CameraUpdateClock();
 	//m_DianaAimHardwareService->UpdateCamera();
 }
 
@@ -447,7 +360,7 @@ void DianaSeven::HandleUpdateRenderRequest()
 
 void DianaSeven::ReadRobotJointAnglesBtnClicked()
 {
-	auto angles = m_DianaAimHardwareService->GetJointAngles();
+	auto angles = m_DianaSevenRobot->GetJointAngles();
 	for (int i = 0; i < angles.size(); ++i)
 	{
 		m_JointAngleLineEdits[i]->setText(QString::number(angles[i] * 180 / PI));
@@ -461,13 +374,13 @@ void DianaSeven::SetRobotJointAnglesBtnClicked()
 	{
 		angles[i] = m_JointAngleLineEdits[i]->text().toDouble() / 180 * PI;
 	}
+	bool ret = m_DianaSevenRobot->SetJointAngles(angles);
 
-	bool ret = m_DianaAimHardwareService->SetJointAngles(angles);
 }
 
 void DianaSeven::GetRobotJointsLimitBtnClicked()
 {
-	auto range = m_DianaAimHardwareService->GetJointsPositionRange();
+	auto range = m_DianaSevenRobot->GetJointAngles();
 
 	auto convertAndPrint = [](const std::vector<double>& values, const std::string& label) {
 		std::cout << label;
@@ -477,34 +390,35 @@ void DianaSeven::GetRobotJointsLimitBtnClicked()
 		}
 		std::cout << std::endl;
 	};
-	convertAndPrint(range[0], "min Range: ");
-	convertAndPrint(range[1], "max Range: ");
+
+	//convertAndPrint(range[0], "min Range: ");
+	//convertAndPrint(range[1], "max Range: ");//不知道咋改，emo了？？？
 }
 
 void DianaSeven::ReadRobotImpedaBtnClicked()
 {
-	auto Impeda = m_DianaAimHardwareService->GetRobotImpeda();
+	auto Impeda = m_DianaSevenRobot->GetRobotImpeda();
 	for (int i = 0; i < m_ImpedaLineEdits.size(); ++i)
 	{
 		m_ImpedaLineEdits[i]->setText(QString::number(Impeda[i]));
 	}
 }
 
-void DianaSeven::SetRobotImpedaBtnClicked()
+void DianaSeven::SetRobotImpedaBtnClicked()//这个地方存疑，帮我瞅瞅这样改对不对
 {
-	double data[7] = { 0.0 };
+	std::vector<double> data;
 	for (int i = 0; i < m_ImpedaLineEdits.size(); ++i)
 	{
-		data[i] = m_ImpedaLineEdits[i]->text().toDouble();
+		data.push_back(m_ImpedaLineEdits.size());
 	}
 
-	m_DianaAimHardwareService->SetRobotImpeda(data);
+	m_DianaSevenRobot->SetRobotImpeda(data);
 }
 
 void DianaSeven::AppendToolTipBtnClicked()
 {
 	auto name = m_Controls.ToolNameComboBox->currentText();
-	auto tip = m_DianaAimHardwareService->GetTipByName(name.toStdString());
+	auto tip = m_AimCamera->GetToolTipByName(name.toStdString());
 	
 	QString str;
 	for (int i = 0; i < tip.size(); ++i)
@@ -518,7 +432,7 @@ void DianaSeven::AppendToolTipBtnClicked()
 void DianaSeven::AppendToolMatrixBtnClicked()
 {
 	auto name = m_Controls.ToolNameComboBox->currentText();
-	auto matrix = m_DianaAimHardwareService->GetMatrixByName(name.toStdString())->GetData();
+	auto matrix = m_AimCamera->GetToolMatrixByName(name.toStdString())->GetData();
 
 	m_Controls.textBrowser->append(name);
 	for (int i = 0; i < 4; ++i)
@@ -540,14 +454,9 @@ void DianaSeven::OnSelectionChanged(berry::IWorkbenchPart::Pointer /*source*/,
   {
     if (node.IsNotNull() && dynamic_cast<mitk::Image *>(node->GetData()))
     {
-  //    m_Controls.labelWarning->setVisible(false);
-  //    m_Controls.buttonPerformImageProcessing->setEnabled(true);
       return;
     }
   }
-
-  //m_Controls.labelWarning->setVisible(true);
-  //m_Controls.buttonPerformImageProcessing->setEnabled(false);
 }
 
 void DianaSeven::DoImageProcessing()

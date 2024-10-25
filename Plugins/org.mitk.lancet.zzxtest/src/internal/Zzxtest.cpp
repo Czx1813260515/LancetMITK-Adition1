@@ -61,7 +61,8 @@ void Zzxtest::initSlot()
 	connect(m_Controls.pushButton_updataData, &QPushButton::clicked, this, &Zzxtest::openCameraQtTimer);//通过定时器触发进行相机更新，拿到数据指针通过工件名称对数据进行索引。通过memcpy进行矩阵的赋值
 	connect(m_Controls.pushButton_SuddenStop, &QPushButton::clicked, this, &Zzxtest::SuddenStop);
 	connect(m_Controls.pushButton_connectArm, &QPushButton::clicked, this, &Zzxtest::connectArm);//连接机械臂并对一些报错进行打印
-	
+	connect(m_Controls.pushButton_cleantext, &QPushButton::clicked, m_Controls.textBrowser, &QTextBrowser::clear);//
+
 	//机械臂移动检测槽函数
 	//运动坐标系选择
 	connect(m_Controls.comboBox_robotMoveType_select, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Zzxtest::onComboBoxIndexChanged);
@@ -197,7 +198,7 @@ void Zzxtest::connectArm()
 {
 	std::string error;
 	this->Robot->connect(error);
-	std::cout << "error" << std::endl;
+	std::cout << error << std::endl;
 }
 
 //---------------------------------------------------------------------------------------------------------------
@@ -451,31 +452,8 @@ void Zzxtest::CombineRotationTranslation(float Rto[3][3], float Tto[3], vtkMatri
 	PrintArray16ToMatrix("T_BaseToBaseRF", T_BaseToBaseRF);//打印T_CamToPatientRF
 	PrintArray16ToMatrix("T_FlangeToEdnRF", T_FlangeToEndRF);//打印T_FlangeToEdnRF
 
-
-
-	////打印机械臂的相关矩阵
-	//double dX = 0; double dY = 0; double dZ = 0;
-	//double dRx = 0; double dRy = 0; double dRz = 0;
-	//int nRet = HRIF_ReadActTcpPos(0, 0, dX, dY, dZ, dRx, dRy, dRz);
-
-	//auto tmpTrans = vtkTransform::New();
-	//tmpTrans->PostMultiply();
-	//tmpTrans->RotateX(dRx);
-	//tmpTrans->RotateY(dRy);
-	//tmpTrans->RotateZ(dRz);
-	//tmpTrans->Translate(dX, dY, dZ);
-	//tmpTrans->Update();
-
-	////VTKT_BaseToFlanger
-	//vtkSmartPointer<vtkMatrix4x4> VTKT_BaseToFlanger = tmpTrans->GetMatrix();
-	//QVector<double> _vtkMatrix4x4;
-	//_vtkMatrix4x4 = { VTKT_BaseToFlanger->GetElement(0,0), VTKT_BaseToFlanger->GetElement(0, 1), VTKT_BaseToFlanger->GetElement(0, 2), VTKT_BaseToFlanger->GetElement(0,3),
-	//				  VTKT_BaseToFlanger->GetElement(1, 0),VTKT_BaseToFlanger->GetElement(1, 1), VTKT_BaseToFlanger->GetElement(1, 2), VTKT_BaseToFlanger->GetElement(1,3),
-	//				  VTKT_BaseToFlanger->GetElement(2, 0), VTKT_BaseToFlanger->GetElement(2, 1), VTKT_BaseToFlanger->GetElement(2, 2), VTKT_BaseToFlanger->GetElement(2,3),
-	//				  VTKT_BaseToFlanger->GetElement(3, 0), VTKT_BaseToFlanger->GetElement(3, 1), VTKT_BaseToFlanger->GetElement(3, 2), VTKT_BaseToFlanger->GetElement(3,3)
-	//};
-	//Print_Matrix("T_BaseToFlanger", VTKT_BaseToFlanger);
-
+	PrintArray16ToMatrix("T_PatientRFToimage", T_PatientRFtoImage);//
+	PrintArray16ToMatrix("T_ImageToImage_icp", T_ImageToImage_icp);//
 }
 void Zzxtest::PrintArray16ToMatrix(const std::string& title, double* Array)
  {

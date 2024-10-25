@@ -1,8 +1,7 @@
-#pragma once
+﻿#pragma once
 #include <qwidget.h>
 #include <qobject.h>
 #include <ui_DianaSevenControls.h>
-#include "DianaAimHardwareService.h"
 #include "SystemPrecision.h"
 #include "FileIO.h"
 
@@ -17,13 +16,17 @@
 #include <mitkNodePredicateOr.h>
 #include <mitkColorProperty.h>
 #include <mitkIRenderWindowPart.h>
+#include "DianaSeven.h"
+#include "AimCamera.h"
+
+
 
 class PrecisionTab :  public QWidget//, public Ui_DianaSevenControls
 {
 	Q_OBJECT
 public:
-	explicit PrecisionTab(Ui::DianaSevenControls ui,mitk::DataStorage* aDataStorage, 
-		lancetAlgorithm::DianaAimHardwareService* aDianaAimHardwareService, QWidget* parent = nullptr);
+	explicit PrecisionTab(Ui::DianaSevenControls ui, mitk::DataStorage* aDataStorage, DianaRobot* aRobot, AimCamera* aCamera, LancetRobotRegistration* aLancetRobReg, QWidget* parent = nullptr);
+
 public slots:
 	void InitConnection();
 	void DisplayPrecisionToolBtnClicked();
@@ -58,10 +61,13 @@ private:
 private:
 	QWidget* m_TabPage;
 	Ui::DianaSevenControls m_ui;
-	lancetAlgorithm::SystemPrecision* m_SystemPrecision;
-	lancetAlgorithm::DianaAimHardwareService* m_DianaAimHardwareService;
-	mitk::IRenderWindowPart* m_IRenderWindowPart;
+	DianaRobot* m_DianaSevenRobot;
+	AimCamera* m_AimCamera;
+	LancetRobotRegistration* m_LancetRobReg;
 
+	lancetAlgorithm::SystemPrecision* m_SystemPrecision;
+
+	mitk::IRenderWindowPart* m_IRenderWindowPart;
 	mitk::DataStorage* m_dataStorage;
 
 };

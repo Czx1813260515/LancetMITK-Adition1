@@ -172,6 +172,17 @@ void DianaRobot::WaitMove()
 	stop();
 }
 
+void DianaRobot::stopRobot()
+{
+	stop();
+}
+
+bool DianaRobot::CleanRobotErrorInfo()
+{
+	int ret = cleanErrorInfo();
+	return ret < 0 ? false : true;
+}
+
 bool DianaRobot::SetPositionMode()
 {
 	int ret = changeControlMode(T_MODE_POSITION);
@@ -256,6 +267,38 @@ void DianaRobot::SetJointAngles(std::vector<double> aJointAngles)
 	moveJToTarget(angles, 0.2, 0.4);
 	WaitMove();
 	delete[] angles;
+}
+
+bool DianaRobot::SetJointAngles(double* angles)
+{
+	auto range = this->GetJointsPositionRange();
+	for (int i = 0; i < range[0].size(); ++i)
+	{
+		if (angles[i] < range[0][i] || angles[i] > range[1][i])
+		{
+			std::cout << "Joint Angle is beyond the limit" << std::endl;
+			return false;
+		}
+	}
+	moveJToTarget(angles, 0.2, 0.4);
+	return true;
+}
+
+std::vector<std::vector<double>> DianaRobot::GetJointsPositionRange()
+{
+	double dblMinPos[7] = { 0 }, dblMaxPos[7] = { 0 };
+	int ret = getJointsPositionRange(dblMinPos, dblMaxPos);
+	std::vector<std::vector<double>> range;
+	std::vector<double> minRange;
+	std::vector<double> maxRange;
+	for (int i = 0; i < 7; ++i)
+	{
+		minRange.push_back(dblMinPos[i]);
+		maxRange.push_back(dblMaxPos[i]);
+	}
+	range.push_back(minRange);
+	range.push_back(maxRange);
+	return range;
 }
 
 vtkSmartPointer<vtkMatrix4x4> DianaRobot::GetBaseToTCP()

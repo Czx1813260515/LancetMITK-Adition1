@@ -40,7 +40,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_5">
       <attribute name="title">
@@ -713,24 +713,11 @@
         </item>
        </layout>
       </widget>
-      <widget class="QPushButton" name="StopRobotMoveBtn">
-       <property name="geometry">
-        <rect>
-         <x>40</x>
-         <y>310</y>
-         <width>301</width>
-         <height>51</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>机械臂停止移动</string>
-       </property>
-      </widget>
       <widget class="QPushButton" name="ClearRobotErrorInfoBtn">
        <property name="geometry">
         <rect>
          <x>40</x>
-         <y>380</y>
+         <y>310</y>
          <width>301</width>
          <height>31</height>
         </rect>
@@ -1018,7 +1005,7 @@
         <rect>
          <x>400</x>
          <y>40</y>
-         <width>445</width>
+         <width>453</width>
          <height>41</height>
         </rect>
        </property>
@@ -2767,9 +2754,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QPushButton" name="pushButton_initDiana_2">
+    <widget class="QPushButton" name="StopRobotMoveBtn">
      <property name="text">
-      <string>初始化</string>
+      <string>机械臂停止移动</string>
      </property>
     </widget>
    </item>
@@ -2786,8 +2773,8 @@
   </layout>
   <zorder>tabWidget</zorder>
   <zorder>labelWarning</zorder>
-  <zorder>pushButton_initDiana_2</zorder>
   <zorder>textBrowser</zorder>
+  <zorder>StopRobotMoveBtn</zorder>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

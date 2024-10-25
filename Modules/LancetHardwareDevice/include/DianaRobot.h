@@ -40,6 +40,10 @@ public:
 
 	void SetJointAngles(std::vector<double> aJointAngles) override;
 
+	bool SetJointAngles(double* angles);
+
+	std::vector<std::vector<double>> GetJointsPositionRange();
+
 	vtkSmartPointer<vtkMatrix4x4> GetBaseToTCP() override;
 	vtkSmartPointer<vtkMatrix4x4> GetFlangeToTCP() override;
 	vtkSmartPointer<vtkMatrix4x4> GetBaseToFlange() override;
@@ -57,6 +61,10 @@ public:
 	bool SetVelocity(double aVelocity) override;
 
 	void WaitMove() override;
+
+	void stopRobot();
+
+	bool CleanRobotErrorInfo();
 
 	bool SetPositionMode();
 

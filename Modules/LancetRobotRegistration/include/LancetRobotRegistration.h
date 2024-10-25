@@ -36,10 +36,14 @@ public:
 	void autoCollection();
 	void setDistance(int);
 	void setAngle(int);
-	void replaceRegistration();
+	int replaceRegistration();
 	void reuseArmMatrix();
 	void saveArmMatrix();
-	
+	vtkSmartPointer<vtkMatrix4x4> getFlangeToEndRF();
+	vtkSmartPointer<vtkMatrix4x4> getBaseToBaseRF();
+	vtkSmartPointer<vtkMatrix4x4> getBaseRFToBase();
+
+
 	signals:
 		void countPose(int cnt); 
 	

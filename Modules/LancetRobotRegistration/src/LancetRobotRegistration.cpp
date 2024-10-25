@@ -1,4 +1,5 @@
 #include <LancetRobotRegistration.h>
+#include "..\include\LancetRobotRegistration.h"
 
 LancetRobotRegistration::LancetRobotRegistration(AbstractRobot* aRobot, AbstractCamera* aCamera)
 {
@@ -244,10 +245,11 @@ void LancetRobotRegistration::setAngle(int aAngle)
 	Angle = aAngle;
 }
 
-void LancetRobotRegistration::replaceRegistration()
+int LancetRobotRegistration::replaceRegistration()
 {
 	m_RobotRegistration.RemoveAllPose();
 	//m_Controls.lineEdit_collectedRoboPose->setText(QString::number(0));
+	return 0;
 }
 
 void LancetRobotRegistration::saveArmMatrix()
@@ -316,6 +318,29 @@ void LancetRobotRegistration::saveArmMatrix()
 	}
 
 	std::cout << "saveArmMatrix operation completed." << std::endl; // Indicate completion
+}
+
+vtkSmartPointer<vtkMatrix4x4> LancetRobotRegistration::getFlangeToEndRF()
+{
+	vtkSmartPointer<vtkMatrix4x4> Ret = vtkSmartPointer<vtkMatrix4x4>::New();
+	Ret->DeepCopy(T_FlangeToEndRF);
+	return Ret;
+}
+
+vtkSmartPointer<vtkMatrix4x4> LancetRobotRegistration::getBaseToBaseRF()
+{
+	vtkSmartPointer<vtkMatrix4x4> Ret = vtkSmartPointer<vtkMatrix4x4>::New();
+	Ret->DeepCopy(T_BaseToBaseRF);
+	return Ret;
+}
+
+vtkSmartPointer<vtkMatrix4x4> LancetRobotRegistration::getBaseRFToBase()
+{
+	vtkSmartPointer<vtkMatrix4x4> Ret = vtkSmartPointer<vtkMatrix4x4>::New();
+
+	Ret->DeepCopy(T_BaseToBaseRF);
+	Ret->Transpose();//Add matrix transposition operation
+	return Ret;
 }
 
 

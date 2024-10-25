@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <qobject.h>
 #include <mitkDataStorage.h>
 #include <mitkBaseData.h>
@@ -9,20 +9,25 @@
 #include <vtkLandmarkTransform.h>
 #include <qthread.h>
 #include "surfaceregistraion.h"
-#include "DianaAimHardwareService.h"
 #include <PrintDataHelper.h>
 #include <mitkIRenderWindowPart.h>
 #include <vtkRenderWindow.h>
 #include <vtkRenderWindowCollection.h>
 #include <QmitkRenderWindow.h>
 #include <vtkRendererCollection.h>
+#include "vtkAxesActor.h"
+#include <LancetRobotRegistration.h>
+#include <DianaRobot.h>
+#include <AimCamera.h>
+
 namespace lancetAlgorithm
 {
 	class SystemPrecision : public QObject
 	{
 		Q_OBJECT
 	public:
-		SystemPrecision(mitk::DataStorage* aDataStorage, DianaAimHardwareService* aDianaAimHardwareService, mitk::IRenderWindowPart* aIRenderWindowPart);
+		SystemPrecision(mitk::DataStorage* aDataStorage, DianaRobot* aRobot, AimCamera* aCamera, LancetRobotRegistration* aLancetRobReg, mitk::IRenderWindowPart* aIRenderWindowPart);
+
 		void DisplayPrecisionTool();
 		void DisplayProbe();
 		
@@ -104,7 +109,11 @@ namespace lancetAlgorithm
 		void AddAxesActor(vtkAxesActor*);
 	private:
 		mitk::DataStorage* m_dataStorage;
-		DianaAimHardwareService* m_DianaAimHardwareService;
+
+		DianaRobot* m_DianaSevenRobot;
+		AimCamera* m_AimCamera;
+		LancetRobotRegistration* m_LancetRobReg;
+
 		mitk::IRenderWindowPart* m_IRenderWindowPart;
 		std::string m_PrecisionToolModelStr = "PrecisionTool";
 		std::string m_RobotEndRF = "RobotEndRF";

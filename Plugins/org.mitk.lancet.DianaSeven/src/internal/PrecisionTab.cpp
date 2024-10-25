@@ -1,10 +1,12 @@
-#include "PrecisionTab.h"
+﻿#include "PrecisionTab.h"
 
 PrecisionTab::PrecisionTab(Ui::DianaSevenControls ui,mitk::DataStorage* aDataStorage,
-	lancetAlgorithm::DianaAimHardwareService* aDianaAimHardwareService, QWidget*  parent) : QWidget(parent)
+	DianaRobot* aRobot, AimCamera* aCamera, LancetRobotRegistration* aLancetRobReg, QWidget*  parent) : QWidget(parent)
 {
 	m_ui = ui;
-	m_DianaAimHardwareService = aDianaAimHardwareService;
+	m_DianaSevenRobot = aRobot;
+	m_AimCamera = aCamera;
+	m_LancetRobReg = aLancetRobReg;
 	m_dataStorage = aDataStorage;
 	//m_IRenderWindowPart = aIRenderWindowPart;
 	if (!m_dataStorage)
@@ -17,6 +19,8 @@ PrecisionTab::PrecisionTab(Ui::DianaSevenControls ui,mitk::DataStorage* aDataSto
 	InitPointSetSelector(m_dataStorage, m_ui.ImageTargetLineSelectWidget);
 	InitConnection();
 }
+
+
 
 void PrecisionTab::InitConnection()
 {
@@ -149,7 +153,7 @@ void PrecisionTab::DisplayTCPAxesActorBtnClicked()
 void PrecisionTab::SetIRenderWindowPart(mitk::IRenderWindowPart* aPart)
 {
 	m_IRenderWindowPart = aPart;
-	m_SystemPrecision = new lancetAlgorithm::SystemPrecision(m_dataStorage, m_DianaAimHardwareService, m_IRenderWindowPart);
+	m_SystemPrecision = new lancetAlgorithm::SystemPrecision(m_dataStorage, m_DianaSevenRobot, m_AimCamera, m_LancetRobReg, m_IRenderWindowPart);
 }
 
 void PrecisionTab::DisplayTCPInRFBtnClicked()

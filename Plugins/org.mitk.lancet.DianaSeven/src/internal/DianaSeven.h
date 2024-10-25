@@ -13,6 +13,7 @@ found in the LICENSE file.
 
 #ifndef DianaSeven_h
 #define DianaSeven_h
+#pragma once
 #include <berryISelectionListener.h>
 #include <QmitkAbstractView.h>
 
@@ -40,7 +41,9 @@ found in the LICENSE file.
 #include <mitkMatrixConvert.h>
 #include "mitkTrackingDeviceSource.h"
 #include "mitkVirtualTrackingDevice.h"
-#include "DianaAimHardwareService.h"
+#include "AimCamera.h"
+#include "DianaRobot.h"
+#include "LancetRobotRegistration.h"
 //#include "PrintDataHelper.h"
 #include "ui_DianaSevenControls.h"
 #include "PrecisionTab.h"
@@ -53,6 +56,8 @@ found in the LICENSE file.
   \sa QmitkAbstractView
   \ingroup ${plugin_target}_internal
 */
+
+class PrecisionTab;
 
 class DianaSeven : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 
@@ -67,16 +72,8 @@ public:
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   //Diana Robot
-  void initDianaNet();
-
   void move_zzj();
-
   void wait_move(const char* m_RobotIpAddress);
-
-  void GoInitial();
-  void Position1();
-  void Position2();
-  void Position3();
 
   void OpenHandGuiding();
   void closeHandGuiding();
@@ -86,6 +83,8 @@ public:
   void PositionAccuracy();
   void PositionRepeatability();
 
+
+  void upDateRegistionLineEdit(int aCount);
   /////////////////////////////////////////////////////
   void ConnectRobotBtnClicked();
   void PowerOnBtnClicked();
@@ -119,34 +118,18 @@ protected:
   bool Translate(const double axis[3]);
   bool Rotate(const double axis[3]);
 
-
-  //vega trackingDeviceSource
-  mitk::TrackingDeviceSource::Pointer m_VegaSource;
-
-  QTimer m_ServoPTimer;
-  //mitk::TrackingDeviceSource::Pointer m_VegaSource;
-  QTimer* m_VegaVisualizeTimer{ nullptr };
-  std::vector<mitk::NavigationData::Pointer> m_VegaNavigationData;
+  std::vector<QLineEdit*> m_JointAngleLineEdits;
+  std::vector<QLineEdit*> m_ImpedaLineEdits;
 
   vtkSmartPointer<vtkMatrix4x4> m_ndiToprobe;
   vtkSmartPointer<vtkMatrix4x4> m_currentProbeMatrix;
   vtkSmartPointer<vtkMatrix4x4> m_probeToProbeNewMatrix;
   vtkSmartPointer<vtkMatrix4x4> m_init_robotMatrix;
-
-  // 定义空间位置变量
-  double dX = 0; double dY = 0; double dZ = 0;
-  double dRx = 0; double dRy = 0; double dRz = 0;
-  std::vector<double> dCoord = { dX, dY, dZ, dRx, dRy, dRz };
   std::vector<double> dTargetPoint = { 0,0,0,0,0,0 };
-  lancetAlgorithm::DianaAimHardwareService* m_DianaAimHardwareService;
-  std::vector<QLineEdit*> m_JointAngleLineEdits;
-  std::vector<QLineEdit*> m_ImpedaLineEdits;
 public:
 	const char* m_RobotIpAddress = "192.168.10.75";
-
 	double vel = 0.1;
 	double acc = 0.2;
-
 	int zv_shaper_order = 0;
 	double zv_shaper_frequency = 0;
 	double zv_shaper_damping_ratio = 0;
@@ -165,6 +148,9 @@ public:
 
 	Ui::DianaSevenControls m_Controls;
 	PrecisionTab* m_PrecisionTab;
+	DianaRobot* m_DianaSevenRobot;
+	AimCamera* m_AimCamera;
+	LancetRobotRegistration* m_LancetRobotRegistration;
 };
 
 #endif // DianaSeven_h
