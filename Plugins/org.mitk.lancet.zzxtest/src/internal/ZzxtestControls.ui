@@ -541,6 +541,19 @@ QPushButton:pressed {
         </item>
        </layout>
       </widget>
+      <widget class="QPushButton" name="pushButton_positionAccuracy">
+       <property name="geometry">
+        <rect>
+         <x>480</x>
+         <y>410</y>
+         <width>301</width>
+         <height>23</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>绝对定位精度</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">

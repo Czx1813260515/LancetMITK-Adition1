@@ -1,10 +1,11 @@
 #include <LancetRobotRegistration.h>
-#include "..\include\LancetRobotRegistration.h"
 
 LancetRobotRegistration::LancetRobotRegistration(AbstractRobot* aRobot, AbstractCamera* aCamera)
 {
 	m_Robot = aRobot;  
 	m_Camera = aCamera; 
+	m_TFlange2EndRF = vtkSmartPointer<vtkMatrix4x4>::New();
+	m_TBaseRF2Base= vtkSmartPointer<vtkMatrix4x4>::New();
 }
 
 void LancetRobotRegistration::setTCPToFlange()
@@ -106,9 +107,12 @@ int LancetRobotRegistration::captureRobot()
 	}
 	else
 	{
-		vtkNew<vtkMatrix4x4> robotEndToFlangeMatrix;
-		m_RobotRegistration.GetTCPmatrix(robotEndToFlangeMatrix);
-		robotEndToFlangeMatrix->Invert();
+		vtkNew<vtkMatrix4x4> TFlange2EndRF;
+		m_RobotRegistration.GetTCPmatrix(TFlange2EndRF);
+		m_TFlange2EndRF->DeepCopy(TFlange2EndRF);
+		vtkSmartPointer<vtkMatrix4x4> TBaseRF2Base = vtkSmartPointer<vtkMatrix4x4>::New();
+		m_RobotRegistration.GetRegistraionMatrix(TBaseRF2Base);
+		m_TBaseRF2Base->DeepCopy(TBaseRF2Base);
 		std::cout << "Registration RMS: " << m_RobotRegistration.RMS() << std::endl;
 	}
 	return m_RobotRegistration.PoseCount();
@@ -264,16 +268,16 @@ void LancetRobotRegistration::saveArmMatrix()
 	}
 
 	// Construct file paths
-	std::string baseToBaseRFPath = (folderPath + "/T_BaseToBaseRF.txt").toStdString();
+	std::string baseToBaseRFPath = (folderPath + "/T_BaseRFToBase.txt").toStdString();
 	std::string flangeToEndRFPath = (folderPath + "/T_FlangeToEndRF.txt").toStdString();
 
-	// Save T_BaseToBaseRF
+	// Save T_BaseRFToBase
 	std::ofstream robotMatrixFile(baseToBaseRFPath);
 	if (robotMatrixFile.is_open())
 	{
 		for (int i = 0; i < 16; i++)
 		{
-			robotMatrixFile << T_BaseToBaseRF[i];
+			robotMatrixFile << m_TBaseRF2Base[i];
 			if (i != 15)
 			{
 				robotMatrixFile << ",";
@@ -298,7 +302,7 @@ void LancetRobotRegistration::saveArmMatrix()
 	{
 		for (int i = 0; i < 16; i++)
 		{
-			robotMatrixFile1 << T_FlangeToEndRF[i];
+			robotMatrixFile1 <<  m_TFlange2EndRF[i];
 			if (i != 15)
 			{
 				robotMatrixFile1 << ",";
@@ -323,26 +327,17 @@ void LancetRobotRegistration::saveArmMatrix()
 vtkSmartPointer<vtkMatrix4x4> LancetRobotRegistration::getFlangeToEndRF()
 {
 	vtkSmartPointer<vtkMatrix4x4> Ret = vtkSmartPointer<vtkMatrix4x4>::New();
-	Ret->DeepCopy(T_FlangeToEndRF);
+	Ret->DeepCopy(m_TFlange2EndRF);
 	return Ret;
-}
 
-vtkSmartPointer<vtkMatrix4x4> LancetRobotRegistration::getBaseToBaseRF()
-{
-	vtkSmartPointer<vtkMatrix4x4> Ret = vtkSmartPointer<vtkMatrix4x4>::New();
-	Ret->DeepCopy(T_BaseToBaseRF);
-	return Ret;
 }
 
 vtkSmartPointer<vtkMatrix4x4> LancetRobotRegistration::getBaseRFToBase()
 {
 	vtkSmartPointer<vtkMatrix4x4> Ret = vtkSmartPointer<vtkMatrix4x4>::New();
-
-	Ret->DeepCopy(T_BaseToBaseRF);
-	Ret->Transpose();//Add matrix transposition operation
+	Ret->DeepCopy(m_TBaseRF2Base);
 	return Ret;
 }
-
 
 void LancetRobotRegistration::reuseArmMatrix()
 {
@@ -358,7 +353,8 @@ void LancetRobotRegistration::reuseArmMatrix()
 	// Construct file paths
 	std::string baseToBaseRFPath = (folderPath + "/T_BaseToBaseRF.txt").toStdString();
 	std::string flangeToEndRFPath = (folderPath + "/T_FlangeToEndRF.txt").toStdString();
-
+	double T_BaseToBaseRF[16] = { 0.0 };
+	double T_FlangeToEndRF[16] = { 0.0 };
 	// Import T_BaseToBaseRF
 	std::ifstream inputFile(baseToBaseRFPath);
 	if (inputFile.is_open())
@@ -407,5 +403,8 @@ void LancetRobotRegistration::reuseArmMatrix()
 
 	// Print T_FlangeToEndRF
 	PrintDataHelper::CoutMatrix("T_FlangeToEndRF", T_FlangeToEndRF);
+	m_TBaseRF2Base->DeepCopy(T_BaseToBaseRF);
+	m_TBaseRF2Base->Invert();
+	m_TFlange2EndRF->DeepCopy(T_FlangeToEndRF);
 }
 

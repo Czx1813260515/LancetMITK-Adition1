@@ -110,6 +110,9 @@ void Zzxtest::initSlot()
 
 	connect(m_Controls.pushButton_setTcpPrecisionTest, &QPushButton::clicked, this, &Zzxtest::SetPrecisionTestTcp);
 	connect(m_Controls.pushButton_confirmImageTargetLine, &QPushButton::clicked, this, &Zzxtest::InterpretImageLine);
+
+	//绝对定位精度
+	connect(m_Controls.pushButton_positionAccuracy, &QPushButton::clicked, this, &Zzxtest::positionAccuracy);
 }
 //void Zzxtest::thread_test(const std::array<double, 6>& jointValue, const std::array<double, 6>& endPosition)
 //{
@@ -316,14 +319,14 @@ void Zzxtest::updateCameraData()
 	{
 		do
 		{
-			//获取数据
+			//获取数据   使用Aimooe制作工具文件时，必须按照以下命名
 			UpdateCameraToToolMatrix(prlt, "HTO_RobotBaseRF", T_CamToBaseRF, m_Controls.Spine_RobotBaseRFDataLabel);
 			UpdateCameraToToolMatrix(prlt, "HTO_RobotEndRF", T_CamToEndRF, m_Controls.Spine_RobotEndRFDataLabel);
 			UpdateCameraToToolMatrix(prlt, "HTO_PatientRF", T_CamToPatientRF, m_Controls.Spine_PatientRFDataLabel);
 			UpdateCameraToToolMatrix(prlt, "HTO_Probe", T_CamToProbe, m_Controls.Spine_ProbeDataLabel);
 
-			//获取Spine_Probe数据
-			if (strcmp(prlt->toolname, "Oral_Probe") == 0)
+			//获取Probe数据
+			if (strcmp(prlt->toolname, "HTO_Probe") == 0)
 			{
 				if (prlt->validflag)
 				{
@@ -452,8 +455,6 @@ void Zzxtest::CombineRotationTranslation(float Rto[3][3], float Tto[3], vtkMatri
 	PrintArray16ToMatrix("T_BaseToBaseRF", T_BaseToBaseRF);//打印T_CamToPatientRF
 	PrintArray16ToMatrix("T_FlangeToEdnRF", T_FlangeToEndRF);//打印T_FlangeToEdnRF
 
-	PrintArray16ToMatrix("T_PatientRFToimage", T_PatientRFtoImage);//
-	PrintArray16ToMatrix("T_ImageToImage_icp", T_ImageToImage_icp);//
 }
 void Zzxtest::PrintArray16ToMatrix(const std::string& title, double* Array)
  {
@@ -493,6 +494,36 @@ void Zzxtest::SuddenStop()
 	std::string error;
 	this->Robot->Stop(error);
 	m_Controls.textBrowser->append(QString::fromStdString(error));
+}
+void Zzxtest::positionAccuracy()
+{
+	bool statue;
+	// 定义Pose数组，包含A到J的位置
+	std::array<std::array<double, 6>, 9> Poses = {
+		 -23.516, 5.064, 73.741, 8.364, 78.372, -40.888 ,
+		 9.107, 18.085, 91.548, -10.252, 74.119, -9.064 ,
+		 4.101, 3.397, 102.229, -9.575, 48.278, -9.738 ,
+		 -20.015, -7.071, 84.538, 7.645, 55.188, -40.621 ,
+		 -39.132, 6.951, 112.357, 22.820, 46.774, -68.897 ,
+		 -9.499, 25.850, 133.423, 0.682, 38.472, -28.014 ,
+		 -10.190, 47.163, 120.171, 0.847, 73.042, -28.300 ,
+		 -51.284, 22.232, 101.279, 22.937, 75.732, -70.083 ,
+		 -17.970, 19.308, 107.319, 6.031, 58.516, -37.685 
+	};
+	std::string error;
+	for (size_t i = 0; i < Poses.size(); ++i) {
+		this->Robot->movej(Poses[i], error);
+		if (!error.empty()) {
+			std::cerr << "Error moving to Pose " << char('A' + i) << ": " << error << std::endl;
+			break; // 如果有错误，停止执行
+		}
+		// 等待机械臂停止运动
+		while (this->Robot->isMoving(statue))
+		{
+			QThread::msleep(1000);
+			QApplication::processEvents();
+		}
+	}
 }
 void Zzxtest::onComboBoxIndexChanged(int index)
 {

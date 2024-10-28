@@ -45,11 +45,6 @@ void DianaSeven::CreateQtPartControl(QWidget* parent)
 	m_LancetRobotRegistration = new LancetRobotRegistration(m_DianaSevenRobot, m_AimCamera);
 	m_PrecisionTab = new PrecisionTab(m_Controls, this->GetDataStorage(), m_DianaSevenRobot,m_AimCamera,m_LancetRobotRegistration, parent);
 
-	connect(m_Controls.pushButton_MoveZZJ, &QPushButton::clicked, this, &DianaSeven::move_zzj);
-
-	connect(m_Controls.pushButton_AccuracyPosition, &QPushButton::clicked, this, &DianaSeven::PositionAccuracy);
-	connect(m_Controls.pushButton_Repeatability, &QPushButton::clicked, this, &DianaSeven::PositionRepeatability);
-
 	connect(m_Controls.pushButton_openFreeDriving, &QPushButton::clicked, this, &DianaSeven::OpenHandGuiding);
 	connect(m_Controls.pushButton_closeFreeDriving, &QPushButton::clicked, this, &DianaSeven::closeHandGuiding);
 	connect(m_Controls.pushButton_JointImpendance, &QPushButton::clicked, this, &DianaSeven::changeToJointImpendance);
@@ -70,15 +65,6 @@ void DianaSeven::RenderWindowPartActivated(mitk::IRenderWindowPart* renderWindow
 void DianaSeven::RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart)
 {
 
-}
-
-
-void DianaSeven::move_zzj()
-{
-	double x = m_Controls.lineEdit_X->text().toDouble();
-	double y = m_Controls.lineEdit_Y->text().toDouble();
-	double z = m_Controls.lineEdit_Z->text().toDouble();
-	m_DianaSevenRobot->Translate(x, y, z);
 }
 
 void DianaSeven::wait_move(const char* m_RobotIpAddress)
@@ -123,19 +109,6 @@ void DianaSeven::changeToJointImpendance()
 	changeControlMode(T_MODE_JOINT_IMPEDANCE, m_RobotIpAddress);
 }
 
-void DianaSeven::PositionAccuracy()
-{
-
-}
-
-void DianaSeven::PositionRepeatability()
-{
-	double PosRepeatInitial[6] = { 0.272069,0.355601,0.347205,0.01958,-0.088089,0.01899 };
-	moveJToPose(PosRepeatInitial, vel, acc, nullptr, zv_shaper_order, zv_shaper_frequency, zv_shaper_damping_ratio);
-	wait_move(m_RobotIpAddress);
-
-	QThread::msleep(3000);
-}
 
 
 void DianaSeven::TargetPointData()//?
@@ -172,7 +145,6 @@ void DianaSeven::InitHardwareDeviceTabConnection()
 	connect(m_Controls.ConnectNDIBtn, &QPushButton::clicked, this, &DianaSeven::ConnectCameraClicked);
 	connect(m_Controls.UpdateCameraBtn, &QPushButton::clicked, this, &DianaSeven::UpdateCameraBtnClicked);
 	connect(m_AimCamera, &AimCamera::CameraUpdateClock, this, &DianaSeven::HandleUpdateRenderRequest);
-	
 }
 
 void DianaSeven::InitRobotRegistrationTabConnection()
@@ -251,7 +223,7 @@ void DianaSeven::InitRobotRegistrationTabConnection()
 			std::string baseRF2ToBaseFileName = "T_BaseRFToBase.txt";
 			std::string flangeToEndRFFileName = "T_FlangeToEndRF.txt";
 
-			FileIO::SaveMatrix2File(FileIO::CombinePath(filename.toStdString(), baseRF2ToBaseFileName).string(), m_LancetRobotRegistration->getBaseRFToBase());//BaseRFToBase??   Perhaps we need to reverse it
+			FileIO::SaveMatrix2File(FileIO::CombinePath(filename.toStdString(), baseRF2ToBaseFileName).string(), m_LancetRobotRegistration->getBaseRFToBase());
 			FileIO::SaveMatrix2File(FileIO::CombinePath(filename.toStdString(), flangeToEndRFFileName).string(), m_LancetRobotRegistration->getFlangeToEndRF());
 		});
 	connect(m_Controls.ReuseRobotRegistationBtn, &QPushButton::clicked, this, [this]() 
@@ -304,10 +276,10 @@ bool DianaSeven::Rotate(const double axis[3])
 	for (int i = 0; i < 3; ++i) {
 		localAxis[i] = axis[i];
 	}
-
 	m_DianaSevenRobot->Rotate(localAxis, m_Controls.RotateAngleLineEdit->text().toDouble());
 	return true;
 }
+
 
 void DianaSeven::upDateRegistionLineEdit(int aCount)
 {

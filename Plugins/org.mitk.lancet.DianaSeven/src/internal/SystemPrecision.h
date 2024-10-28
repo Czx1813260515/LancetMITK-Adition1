@@ -15,7 +15,7 @@
 #include <vtkRenderWindowCollection.h>
 #include <QmitkRenderWindow.h>
 #include <vtkRendererCollection.h>
-#include "vtkAxesActor.h"
+#include <vtkAxesActor.h>
 #include <LancetRobotRegistration.h>
 #include <DianaRobot.h>
 #include <AimCamera.h>

@@ -57,8 +57,6 @@ found in the LICENSE file.
   \ingroup ${plugin_target}_internal
 */
 
-class PrecisionTab;
-
 class DianaSeven : public QmitkAbstractView, public mitk::IRenderWindowPartListener
 
 {
@@ -72,7 +70,6 @@ public:
   void RenderWindowPartDeactivated(mitk::IRenderWindowPart* renderWindowPart) override;
 
   //Diana Robot
-  void move_zzj();
   void wait_move(const char* m_RobotIpAddress);
 
   void OpenHandGuiding();
@@ -80,8 +77,6 @@ public:
   void changeToCartImpendance();
   void changeToJointImpendance();
 
-  void PositionAccuracy();
-  void PositionRepeatability();
 
 
   void upDateRegistionLineEdit(int aCount);
@@ -125,6 +120,7 @@ protected:
   vtkSmartPointer<vtkMatrix4x4> m_currentProbeMatrix;
   vtkSmartPointer<vtkMatrix4x4> m_probeToProbeNewMatrix;
   vtkSmartPointer<vtkMatrix4x4> m_init_robotMatrix;
+
   std::vector<double> dTargetPoint = { 0,0,0,0,0,0 };
 public:
 	const char* m_RobotIpAddress = "192.168.10.75";
@@ -145,6 +141,11 @@ public:
 	double joints_final[7] = {0.0};
 
 	double activeTcpPose[6] = { -113.079,145.354,-97.1639,57.4587,-87.4711,-26.5523 };
+
+
+	//机械臂配准数据
+	double T_BaseToBaseRF[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+
 
 	Ui::DianaSevenControls m_Controls;
 	PrecisionTab* m_PrecisionTab;

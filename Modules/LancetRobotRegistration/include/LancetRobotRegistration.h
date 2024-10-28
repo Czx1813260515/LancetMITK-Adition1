@@ -2,7 +2,6 @@
 #ifndef LANCETROBOTREGISTRATION_h
 #define LANCETROBOTREGISTRATION_h
 #include "MitkLancetRobotRegistrationExports.h"
-
 #include "AbstractCamera.h"
 #include "AbstractRobot.h"
 #include "AimCamera.h"
@@ -40,8 +39,8 @@ public:
 	void reuseArmMatrix();
 	void saveArmMatrix();
 	vtkSmartPointer<vtkMatrix4x4> getFlangeToEndRF();
-	vtkSmartPointer<vtkMatrix4x4> getBaseToBaseRF();
 	vtkSmartPointer<vtkMatrix4x4> getBaseRFToBase();
+
 
 
 	signals:
@@ -55,9 +54,8 @@ private:
 	int Distance = 50;
 	int Angle = 15;
 
-	//机械臂配准数据
-	double T_BaseToBaseRF[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
-	double T_FlangeToEndRF[16]{ 1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1 };
+	vtkSmartPointer<vtkMatrix4x4> m_TFlange2EndRF;
+	vtkSmartPointer<vtkMatrix4x4> m_TBaseRF2Base;
 private:
 	void Sleep(int);
 };

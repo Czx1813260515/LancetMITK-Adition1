@@ -1,10 +1,8 @@
 ﻿#pragma once
 #include <qwidget.h>
-#include <qobject.h>
 #include <ui_DianaSevenControls.h>
 #include "SystemPrecision.h"
 #include "FileIO.h"
-
 #include <QmitkSingleNodeSelectionWidget.h>
 #include <mitkNodePredicateAnd.h>
 #include <mitkNodePredicateNot.h>
@@ -15,11 +13,6 @@
 #include <mitkNodePredicateDataType.h>
 #include <mitkNodePredicateOr.h>
 #include <mitkColorProperty.h>
-#include <mitkIRenderWindowPart.h>
-#include "DianaSeven.h"
-#include "AimCamera.h"
-
-
 
 class PrecisionTab :  public QWidget//, public Ui_DianaSevenControls
 {

@@ -366,7 +366,7 @@ vtkSmartPointer<vtkMatrix4x4> lancetAlgorithm::SystemPrecision::CalculateBase2Im
 	TBaseRF2Camera->Invert();
 
 	vtkSmartPointer<vtkMatrix4x4> TBase2BaseRF = vtkSmartPointer<vtkMatrix4x4>::New();
-	TBase2BaseRF->DeepCopy(m_LancetRobReg->getBaseToBaseRF());
+	TBase2BaseRF->DeepCopy(m_LancetRobReg->getBaseRFToBase());
 	TBase2BaseRF->Invert();
 
 	vtkSmartPointer<vtkMatrix4x4> TCamera2BoxRF = vtkSmartPointer<vtkMatrix4x4>::New();
@@ -605,7 +605,7 @@ void lancetAlgorithm::SystemPrecision::PrintTCPInCamera(QTextBrowser* browser)
 	TCamera2BaseRF->DeepCopy(m_AimCamera->GetToolMatrixByName(m_RobotBaseRF));
 
 	vtkSmartPointer<vtkMatrix4x4> TBaseRF2Base = vtkSmartPointer<vtkMatrix4x4>::New();
-	TBaseRF2Base->DeepCopy(m_LancetRobReg->getBaseToBaseRF());
+	TBaseRF2Base->DeepCopy(m_LancetRobReg->getBaseRFToBase());
 
 	vtkSmartPointer<vtkMatrix4x4> TCamera2TCP = vtkSmartPointer<vtkMatrix4x4>::New();
 	TCamera2TCP->DeepCopy(PreConcatenateMatrixs(TCamera2EndRF, TEndRF2TCP));

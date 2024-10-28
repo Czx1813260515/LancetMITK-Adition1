@@ -121,6 +121,7 @@ protected:
 	double Zzxtest::GetRegisrationRMS(mitk::PointSet* points, mitk::Surface* surface, vtkMatrix4x4* matrix);
 	void computeAverageTransform(vtkMatrix4x4* samples[], vtkMatrix4x4* average);
 	void PrintMatrix(std::string matrixName, double* matrix);
+
 public slots:
 	//tab1
 	void powerOn();
@@ -133,7 +134,10 @@ public slots:
 	void check_IsMoving();
 	void updateCameraData();
 
+	//positionAccuracy
+	void positionAccuracy();
 	//
+
 	void onComboBoxIndexChanged(int index);
 	void xp();
 	void yp();
